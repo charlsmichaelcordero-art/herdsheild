@@ -809,7 +809,7 @@
           <button class="btn btn-secondary" id="btn-show-queue" style="font-size: 0.75rem; padding: 8px;">
             <i class="fa-solid fa-clipboard-list"></i> Requests Queue
           </button>
-          <button class="btn btn-outline" id="btn-show-logs" style="font-size: 0.75rem; padding: 8px;">
+          <button class="btn btn-outline" id="btn-show-logs" style="font-size: 0.75rem; padding: 8px; display: none;">
             <i class="fa-solid fa-list-check"></i> Audit Log Trail
           </button>
         </div>
@@ -1063,12 +1063,16 @@
             document.getElementById('admin-user-name').textContent = currentProfile.full_name;
             
             const roleBadge = document.getElementById('admin-user-role');
+            const logsBtn = document.getElementById('btn-show-logs');
+
             if (currentProfile.role === 'admin') {
               roleBadge.textContent = 'System Administrator';
               roleBadge.className = 'badge badge-admin';
+              logsBtn.style.display = 'block'; // Only visible for Admin
             } else {
               roleBadge.textContent = 'Veterinarian / Staff';
               roleBadge.className = 'badge badge-staff';
+              logsBtn.style.display = 'none'; // Hidden for Staff
             }
 
             switchView('adminDashboard');
@@ -1234,6 +1238,8 @@
 
           if (error) throw error;
 
+          const isAdmin = currentProfile && currentProfile.role === 'admin';
+
           if (data && data.length > 0) {
             listContainer.innerHTML = data.map(r => `
               <div class="card" style="margin-bottom: 12px;">
@@ -1269,9 +1275,11 @@
                     </button>
                   ` : ''}
 
-                  <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 6px; font-size: 0.75rem;">
-                    <i class="fa-solid fa-trash"></i> Delete
-                  </button>
+                  ${isAdmin ? `
+                    <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 6px; font-size: 0.75rem;">
+                      <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                  ` : ''}
                 </div>
               </div>
             `).join('');
@@ -1281,8 +1289,13 @@
         } catch (e) { listContainer.innerHTML = 'Error loading requests.'; }
       }
 
-      // DELETE REQUEST
+      // DELETE REQUEST (ADMIN ONLY)
       window.deleteRequest = async function(id) {
+        if (currentProfile && currentProfile.role !== 'admin') {
+          showInAppToast('Only admins can delete/archive requests.', 'error');
+          return;
+        }
+
         try {
           const { error } = await supabase
             .from('vaccination_requests')
@@ -1435,7 +1448,10 @@
         loadVaccineData();
       });
 
+      // AUDIT LOG TRAIL (ONLY FOR ADMIN)
       document.getElementById('btn-show-logs').addEventListener('click', async function() {
+        if (!currentProfile || currentProfile.role !== 'admin') return;
+
         document.getElementById('admin-panel-title').innerHTML = '<i class="fa-solid fa-list-check"></i> System Audit Log Trail';
         const listContainer = document.getElementById('vet-request-list');
         listContainer.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-muted);">Loading audit trail...</p>';
