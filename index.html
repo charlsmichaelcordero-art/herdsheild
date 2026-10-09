@@ -777,9 +777,11 @@
     const SUPABASE_URL = 'https://kvfnrjuhwbdgqevvuahv.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2Zm5yanVod2JkZ3FldnZ1YWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MTQwODQsImV4cCI6MjEwNzA5MDA4NH0.zuXRrzhviOcYztiDeWaEulSGYck-6GhXG9eLuVCgOGY';
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     document.addEventListener("DOMContentLoaded", function() {
+      // Use window.supabaseClient for queries
+      const supabase = window.supabaseClient;
 
       // Update System Clock
       function updateClock() {
