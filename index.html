@@ -447,6 +447,8 @@
     }
 
     .badge-admin { background: rgba(156, 39, 176, 0.3); color: #e1bee7; border: 1px solid #9c27b0; }
+    .badge-staff { background: rgba(0, 150, 136, 0.3); color: #80cbd2; border: 1px solid #009688; }
+    .badge-user { background: rgba(46, 125, 50, 0.3); color: #81c784; border: 1px solid #2e7d32; }
     .badge-pending { background: rgba(239, 108, 0, 0.3); color: #ffcc80; border: 1px solid #ef6c00; }
     .badge-approved { background: rgba(46, 125, 50, 0.3); color: #81c784; border: 1px solid #2e7d32; }
     .badge-declined { background: rgba(198, 40, 40, 0.3); color: #ef9a9a; border: 1px solid #c62828; }
@@ -512,7 +514,7 @@
       </button>
     </div>
 
-    <!-- Request Vaccination Modal (For Farmer Submission) -->
+    <!-- Request Vaccination Modal (For User Submission) -->
     <div class="modal-overlay" id="request-modal">
       <div class="modal-box">
         <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-syringe" style="color: var(--brand-gold);"></i> Request Vaccination</h3>
@@ -579,9 +581,7 @@
     <!-- Main View Container -->
     <div class="view-container">
 
-      <!-- ===================================================================
-           VIEW 1: LOGIN SCREEN
-           =================================================================== -->
+      <!-- VIEW 1: LOGIN SCREEN -->
       <div class="app-view active" id="view-login">
         <div style="text-align: center; margin-top: 10px; margin-bottom: 25px;">
           <h2 style="font-size: 1.5rem;">Welcome Back</h2>
@@ -622,13 +622,11 @@
         </div>
       </div>
 
-      <!-- ===================================================================
-           VIEW 2: REGISTER SCREEN WITH ROLE SELECTION
-           =================================================================== -->
+      <!-- VIEW 2: REGISTER SCREEN WITH 3 EXPLICIT ROLES -->
       <div class="app-view" id="view-register">
         <div style="text-align: center; margin-bottom: 20px;">
           <h2>Create Account</h2>
-          <p>Register as a Livestock Owner or Veterinarian</p>
+          <p>Select your account role below</p>
         </div>
 
         <div class="alert-box alert-error" id="register-alert">
@@ -642,8 +640,9 @@
             <div class="input-wrapper">
               <i class="fa-solid fa-user-shield input-icon"></i>
               <select class="form-control" id="reg-role" required>
-                <option value="farmer">Livestock Owner / Farmer</option>
-                <option value="vet">Veterinarian / Admin</option>
+                <option value="user">User (Livestock Owner / Farmer)</option>
+                <option value="staff">Staff (Veterinarian / Field Tech)</option>
+                <option value="admin">Admin (System Administrator)</option>
               </select>
             </div>
           </div>
@@ -691,14 +690,12 @@
         </div>
       </div>
 
-      <!-- ===================================================================
-           VIEW 3A: ADMIN / VETERINARIAN DASHBOARD
-           =================================================================== -->
+      <!-- VIEW 3A: ADMIN / STAFF MANAGEMENT DASHBOARD -->
       <div class="app-view" id="view-admin-dashboard">
         <div class="user-welcome-card">
           <div>
             <h3 id="admin-user-name" style="margin: 0;">Dr. Sarah Connor</h3>
-            <span id="admin-user-role" class="badge badge-admin" style="margin-top: 4px; display: inline-block;">Veterinarian / Admin</span>
+            <span id="admin-user-role" class="badge badge-admin" style="margin-top: 4px; display: inline-block;">System Administrator</span>
           </div>
           <div style="font-size: 2rem; color: var(--brand-gold);">
             <i class="fa-solid fa-user-doctor"></i>
@@ -709,7 +706,7 @@
           <i class="fa-solid fa-clipboard-list"></i> Incoming Requests
         </h4>
 
-        <!-- Vet Request Management List -->
+        <!-- Request Queue for Admin and Staff -->
         <div id="vet-request-list">
           <p style="font-size: 0.8rem; color: var(--text-muted);">Loading requests...</p>
         </div>
@@ -719,14 +716,12 @@
         </button>
       </div>
 
-      <!-- ===================================================================
-           VIEW 3B: LIVESTOCK OWNER DASHBOARD
-           =================================================================== -->
+      <!-- VIEW 3B: USER / LIVESTOCK OWNER DASHBOARD -->
       <div class="app-view" id="view-owner-dashboard">
         <div class="user-welcome-card">
           <div>
             <h3 id="owner-user-name" style="margin: 0;">John Doe</h3>
-            <span id="owner-user-role" class="badge badge-approved" style="margin-top: 4px; display: inline-block;">Livestock Owner</span>
+            <span id="owner-user-role" class="badge badge-user" style="margin-top: 4px; display: inline-block;">Livestock Owner</span>
           </div>
           <div style="font-size: 2rem; color: var(--brand-gold);">
             <i class="fa-solid fa-wheat-awn"></i>
@@ -773,14 +768,14 @@
 
   <!-- JavaScript App Controller & Connected Supabase Integration -->
   <script>
-    // Supabase Credentials Connected
+    // Supabase Credentials
     const SUPABASE_URL = 'https://kvfnrjuhwbdgqevvuahv.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2Zm5yanVod2JkZ3FldnZ1YWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MTQwODQsImV4cCI6MjEwNzA5MDA4NH0.zuXRrzhviOcYztiDeWaEulSGYck-6GhXG9eLuVCgOGY';
 
+    // Global Client Instance attached to window object
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     document.addEventListener("DOMContentLoaded", function() {
-      // Use window.supabaseClient for queries
       const supabase = window.supabaseClient;
 
       // Update System Clock
@@ -870,12 +865,25 @@
           currentProfile = profile;
           setLoading(false);
 
-          if (currentProfile.role === 'vet') {
+          // Route to management view for 'admin' or 'staff', otherwise route to user dashboard
+          if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
             document.getElementById('admin-user-name').textContent = currentProfile.full_name;
+            
+            const roleBadge = document.getElementById('admin-user-role');
+            if (currentProfile.role === 'admin') {
+              roleBadge.textContent = 'System Administrator';
+              roleBadge.className = 'badge badge-admin';
+            } else {
+              roleBadge.textContent = 'Veterinarian / Staff';
+              roleBadge.className = 'badge badge-staff';
+            }
+
             switchView('adminDashboard');
             loadVetRequests();
           } else {
             document.getElementById('owner-user-name').textContent = currentProfile.full_name;
+            document.getElementById('owner-user-role').textContent = 'Livestock Owner';
+            document.getElementById('owner-user-role').className = 'badge badge-user';
             switchView('ownerDashboard');
             loadOwnerRequests();
           }
@@ -925,7 +933,7 @@
         }
       });
 
-      // 3. FARMER: LOAD OWN VACCINATION REQUESTS FROM SUPABASE
+      // 3. USER: LOAD OWN VACCINATION REQUESTS
       async function loadOwnerRequests() {
         const listContainer = document.getElementById('owner-request-list');
         try {
@@ -953,7 +961,7 @@
         } catch (e) { listContainer.innerHTML = 'Error loading requests.'; }
       }
 
-      // 4. VETERINARIAN: LOAD ALL INCOMING REQUESTS FROM SUPABASE
+      // 4. ADMIN & STAFF: LOAD ALL INCOMING REQUESTS
       async function loadVetRequests() {
         const listContainer = document.getElementById('vet-request-list');
         try {
@@ -987,7 +995,7 @@
         } catch (e) { listContainer.innerHTML = 'Error loading requests.'; }
       }
 
-      // 5. VETERINARIAN: PROCESS REQUEST IN SUPABASE
+      // 5. ADMIN & STAFF: UPDATE STATUS
       window.updateStatus = async function(id, newStatus) {
         try {
           const { error } = await supabase
@@ -999,7 +1007,7 @@
         } catch(e) { alert("Error updating status."); }
       };
 
-      // 6. FARMER: SUBMIT VACCINATION REQUEST TO SUPABASE
+      // 6. USER: SUBMIT VACCINATION REQUEST
       document.getElementById('request-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const payload = {
