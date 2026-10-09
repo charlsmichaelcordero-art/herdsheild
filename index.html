@@ -621,14 +621,22 @@
           <button class="btn btn-outline" id="btn-goto-register">Create Account</button>
         </div>
 
-        <!-- Demo Credentials Card inside view-login -->
+        <!-- Quick Select Demo Buttons -->
         <div class="card" style="margin-top: 20px; border-style: dashed;">
-          <h4 style="font-size: 0.85rem; color: var(--brand-gold); margin-bottom: 8px;">
-            <i class="fa-solid fa-key"></i> Demo Credentials:
+          <h4 style="font-size: 0.85rem; color: var(--brand-gold); margin-bottom: 10px;">
+            <i class="fa-solid fa-key"></i> Quick Fill Credentials:
           </h4>
-          <p style="font-size: 0.75rem; margin-bottom: 4px;"><strong>Admin:</strong> admin@herdshield.com | password123</p>
-          <p style="font-size: 0.75rem; margin-bottom: 4px;"><strong>Staff:</strong> staff@herdshield.com | password123</p>
-          <p style="font-size: 0.75rem; margin-bottom: 0;"><strong>User:</strong> user@herdshield.com | password123</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('admin@herdshield.com', 'password123')">
+              <i class="fa-solid fa-user-gear"></i> Fill Admin
+            </button>
+            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('staff@herdshield.com', 'password123')">
+              <i class="fa-solid fa-user-doctor"></i> Fill Staff
+            </button>
+            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('user@herdshield.com', 'password123')">
+              <i class="fa-solid fa-wheat-awn"></i> Fill User
+            </button>
+          </div>
         </div>
 
       </div> <!-- view-login closes HERE -->
@@ -785,7 +793,14 @@
 
     // Global Client Instance attached to window object
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+    // Auto-fill login fields on button click
+    window.fillLogin = function(email, password) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = password;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(`${email} | ${password}`);
+      }
+    };
     document.addEventListener("DOMContentLoaded", function() {
       const supabase = window.supabaseClient;
 
