@@ -297,17 +297,17 @@
 
     .btn {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
       border-radius: 10px;
       font-family: var(--font-heading);
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       transition: all var(--transition-speed);
     }
 
@@ -339,6 +339,11 @@
 
     .btn-success {
       background: #2e7d32;
+      color: var(--text-white);
+    }
+
+    .btn-info {
+      background: #0288d1;
       color: var(--text-white);
     }
 
@@ -468,6 +473,7 @@
     .badge-user { background: rgba(46, 125, 50, 0.3); color: #81c784; border: 1px solid #2e7d32; }
     .badge-pending { background: rgba(239, 108, 0, 0.3); color: #ffcc80; border: 1px solid #ef6c00; }
     .badge-approved { background: rgba(46, 125, 50, 0.3); color: #81c784; border: 1px solid #2e7d32; }
+    .badge-completed { background: rgba(3, 169, 244, 0.3); color: #81d4fa; border: 1px solid #03a9f4; }
     .badge-declined { background: rgba(198, 40, 40, 0.3); color: #ef9a9a; border: 1px solid #c62828; }
 
     .bottom-nav {
@@ -536,7 +542,29 @@
       </button>
     </div>
 
-    <!-- Request Vaccination Modal (For User Submission) -->
+    <!-- Approve & Schedule Vaccination Modal -->
+    <div class="modal-overlay" id="schedule-modal">
+      <div class="modal-box">
+        <h3 style="margin-bottom: 10px;"><i class="fa-solid fa-calendar-check" style="color: var(--brand-gold);"></i> Schedule Vaccination</h3>
+        <p style="font-size: 0.75rem;">Set date and time for field attendance.</p>
+        <form id="schedule-form">
+          <input type="hidden" id="sched-request-id">
+          <div class="form-group">
+            <label class="form-label">Vaccination Date & Time</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-clock input-icon"></i>
+              <input type="datetime-local" class="form-control" id="sched-datetime" required>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" id="cancel-sched-btn">Cancel</button>
+            <button type="submit" class="btn btn-success">Confirm & Approve</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Request Vaccination Modal -->
     <div class="modal-overlay" id="request-modal">
       <div class="modal-box">
         <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-syringe" style="color: var(--brand-gold);"></i> Request Vaccination</h3>
@@ -581,7 +609,7 @@
       </div>
     </div>
 
-    <!-- Add Animal Tag Modal (For User Quick Registration) -->
+    <!-- Add Animal Tag Modal -->
     <div class="modal-overlay" id="add-animal-modal">
       <div class="modal-box">
         <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-plus-circle" style="color: var(--brand-gold);"></i> Register Livestock</h3>
@@ -626,7 +654,7 @@
       <div class="modal-box" style="text-align: center;">
         <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--brand-gold); margin-bottom: 12px;"></i>
         <h3>Confirm Logout</h3>
-        <p style="margin-top: 8px;">Are you sure you want to logout/sign out?</p>
+        <p style="margin-top: 8px;">Are you sure you want to sign out?</p>
         <div style="display: flex; gap: 10px; margin-top: 20px;">
           <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
           <button class="btn btn-danger" id="modal-confirm-btn">Yes, Logout</button>
@@ -695,9 +723,9 @@
           </div>
         </div>
 
-      </div> <!-- view-login closes HERE -->
+      </div>
 
-      <!-- VIEW 2: REGISTER SCREEN WITH 3 EXPLICIT ROLES -->
+      <!-- VIEW 2: REGISTER SCREEN -->
       <div class="app-view" id="view-register">
         <div style="text-align: center; margin-bottom: 20px;">
           <h2>Create Account</h2>
@@ -765,11 +793,11 @@
         </div>
       </div>
 
-      <!-- VIEW 3A: ADMIN / STAFF MANAGEMENT DASHBOARD -->
+      <!-- VIEW 3A: ADMIN / STAFF DASHBOARD -->
       <div class="app-view" id="view-admin-dashboard">
         <div class="user-welcome-card">
           <div>
-            <h3 id="admin-user-name" style="margin: 0;">Dr. Sarah Connor</h3>
+            <h3 id="admin-user-name" style="margin: 0;">Officer</h3>
             <span id="admin-user-role" class="badge badge-admin" style="margin-top: 4px; display: inline-block;">System Administrator</span>
           </div>
           <div style="font-size: 2rem; color: var(--brand-gold);">
@@ -787,7 +815,7 @@
         </div>
 
         <h4 id="admin-panel-title" style="margin-top: 15px; margin-bottom: 12px; color: var(--brand-gold);">
-          <i class="fa-solid fa-clipboard-list"></i> Incoming Requests Queue
+          <i class="fa-solid fa-clipboard-list"></i> Incoming Requests & Attendance
         </h4>
 
         <div id="vet-request-list">
@@ -799,11 +827,11 @@
         </button>
       </div>
 
-      <!-- VIEW 3B: USER / LIVESTOCK OWNER DASHBOARD -->
+      <!-- VIEW 3B: USER DASHBOARD -->
       <div class="app-view" id="view-owner-dashboard">
         <div class="user-welcome-card">
           <div>
-            <h3 id="owner-user-name" style="margin: 0;">John Doe</h3>
+            <h3 id="owner-user-name" style="margin: 0;">Farmer</h3>
             <span id="owner-user-role" class="badge badge-user" style="margin-top: 4px; display: inline-block;">Livestock Owner</span>
           </div>
           <div style="font-size: 2rem; color: var(--brand-gold);">
@@ -863,7 +891,7 @@
         </div>
       </div>
 
-    </div> <!-- End View Container -->
+    </div>
 
     <!-- Mobile Bottom Navigation -->
     <div class="bottom-nav" id="bottom-navigation" style="display: none;">
@@ -885,7 +913,7 @@
       </div>
     </div>
 
-  </div> <!-- End Mobile Frame -->
+  </div>
 
   <script>
     const SUPABASE_URL = 'https://kvfnrjuhwbdgqevvuahv.supabase.co';
@@ -893,7 +921,6 @@
 
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // In-App Notification Toast Function
     window.showInAppToast = function(message, type = 'success') {
       const toast = document.getElementById('app-toast');
       const icon = document.getElementById('toast-icon');
@@ -910,9 +937,7 @@
         icon.style.color = '#81c784';
       }
 
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      setTimeout(() => { toast.classList.remove('show'); }, 3000);
     };
 
     window.fillLogin = function(email, password) {
@@ -1101,6 +1126,55 @@
         }
       });
 
+      // OPEN SCHEDULE MODAL FOR APPROVAL
+      window.openScheduleModal = function(requestId) {
+        document.getElementById('sched-request-id').value = requestId;
+        document.getElementById('schedule-modal').classList.add('active');
+      };
+
+      document.getElementById('cancel-sched-btn').addEventListener('click', () => {
+        document.getElementById('schedule-modal').classList.remove('active');
+      });
+
+      // SUBMIT APPROVAL & SET SCHEDULED TIME
+      document.getElementById('schedule-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const requestId = document.getElementById('sched-request-id').value;
+        const scheduledTime = document.getElementById('sched-datetime').value;
+
+        try {
+          const { error } = await supabase.from('vaccination_requests').update({
+            status: 'Approved',
+            scheduled_time: scheduledTime,
+            administered_by: currentProfile.full_name
+          }).eq('id', requestId);
+
+          if (error) throw error;
+
+          await logAuditTrail('APPROVE_AND_SCHEDULE_VACCINATION', { requestId, scheduledTime });
+          showInAppToast('Vaccination scheduled & approved!', 'success');
+          document.getElementById('schedule-modal').classList.remove('active');
+          loadVetRequests();
+        } catch(e) { showInAppToast("Error scheduling: " + e.message, 'error'); }
+      });
+
+      // MARK VACCINATION AS COMPLETED
+      window.markAsCompleted = async function(requestId) {
+        try {
+          const completionTime = new Date().toISOString();
+          const { error } = await supabase.from('vaccination_requests').update({
+            status: 'Completed',
+            completed_at: completionTime
+          }).eq('id', requestId);
+
+          if (error) throw error;
+
+          await logAuditTrail('COMPLETE_VACCINATION', { requestId, completed_at: completionTime });
+          showInAppToast('Vaccination marked as COMPLETED!', 'success');
+          loadVetRequests();
+        } catch(e) { showInAppToast("Error completing request.", 'error'); }
+      };
+
       // USER: LOAD VACCINATION REQUESTS
       async function loadOwnerRequests() {
         const listContainer = document.getElementById('owner-request-list');
@@ -1115,14 +1189,28 @@
 
           if (data && data.length > 0) {
             listContainer.innerHTML = data.map(r => `
-              <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <div class="card" style="margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                   <strong>${r.animal_tag} - ${r.vaccine_type}</strong>
                   <span class="badge badge-${r.status.toLowerCase()}">${r.status}</span>
                 </div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Requested Date: ${r.requested_date}</div>
+                
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">Requested: ${r.requested_date}</div>
+
+                ${r.scheduled_time ? `
+                  <div style="font-size: 0.75rem; color: var(--brand-gold); margin-top: 4px;">
+                    <i class="fa-solid fa-calendar-day"></i> <b>Scheduled Time:</b> ${new Date(r.scheduled_time).toLocaleString()}
+                  </div>
+                ` : ''}
+
+                ${r.completed_at ? `
+                  <div style="font-size: 0.75rem; color: #81d4fa; margin-top: 4px;">
+                    <i class="fa-solid fa-circle-check"></i> <b>Vaccinated On:</b> ${new Date(r.completed_at).toLocaleString()}
+                  </div>
+                ` : ''}
+
                 ${r.status === 'Pending' ? `
-                  <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 4px 10px; font-size: 0.7rem; width: auto; align-self: flex-end;">
+                  <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 4px 8px; font-size: 0.7rem; margin-top: 8px; width: auto;">
                     <i class="fa-solid fa-xmark"></i> Cancel Request
                   </button>
                 ` : ''}
@@ -1136,7 +1224,7 @@
 
       // ADMIN & STAFF: LOAD ALL INCOMING REQUESTS
       async function loadVetRequests() {
-        document.getElementById('admin-panel-title').innerHTML = '<i class="fa-solid fa-clipboard-list"></i> Incoming Requests Queue';
+        document.getElementById('admin-panel-title').innerHTML = '<i class="fa-solid fa-clipboard-list"></i> Incoming Requests & Attendance';
         const listContainer = document.getElementById('vet-request-list');
         try {
           const { data, error } = await supabase
@@ -1154,12 +1242,33 @@
                   <span class="badge badge-${r.status.toLowerCase()}">${r.status}</span>
                 </div>
                 <p style="font-size: 0.8rem; margin: 6px 0;">Tag: <b>${r.animal_tag}</b> | Vaccine: <b>${r.vaccine_type}</b></p>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Date Requested: ${r.requested_date}</div>
-                <div style="display: flex; gap: 8px;">
+                
+                ${r.scheduled_time ? `
+                  <div style="font-size: 0.75rem; color: var(--brand-gold); margin-bottom: 4px;">
+                    <i class="fa-solid fa-clock"></i> <b>Scheduled:</b> ${new Date(r.scheduled_time).toLocaleString()}
+                  </div>
+                ` : ''}
+
+                ${r.completed_at ? `
+                  <div style="font-size: 0.75rem; color: #81d4fa; margin-bottom: 4px;">
+                    <i class="fa-solid fa-check-double"></i> <b>Done At:</b> ${new Date(r.completed_at).toLocaleString()}
+                  </div>
+                ` : ''}
+
+                <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
                   ${r.status === 'Pending' ? `
-                    <button class="btn btn-success" onclick="updateStatus(${r.id}, 'Approved')" style="padding: 6px; font-size: 0.75rem;">Approve</button>
+                    <button class="btn btn-success" onclick="openScheduleModal(${r.id})" style="padding: 6px; font-size: 0.75rem;">
+                      <i class="fa-solid fa-calendar-plus"></i> Approve & Schedule
+                    </button>
                     <button class="btn btn-secondary" onclick="updateStatus(${r.id}, 'Declined')" style="padding: 6px; font-size: 0.75rem;">Decline</button>
                   ` : ''}
+
+                  ${r.status === 'Approved' ? `
+                    <button class="btn btn-info" onclick="markAsCompleted(${r.id})" style="padding: 6px; font-size: 0.75rem;">
+                      <i class="fa-solid fa-square-check"></i> Mark as Done
+                    </button>
+                  ` : ''}
+
                   <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 6px; font-size: 0.75rem;">
                     <i class="fa-solid fa-trash"></i> Delete
                   </button>
