@@ -17,11 +17,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* ==========================================================================
-       HERDSHIELD DESIGN SYSTEM & COLOR PALETTE
-       Colors: #181109 | #251b0e | #332514 | #402e19 | #4d381e
-       Typography: Poppins (Bold Headings) | Open Sans (Body)
-       ========================================================================== */
     :root {
       --bg-darkest: #181109;
       --bg-dark: #251b0e;
@@ -64,7 +59,6 @@
       overflow: hidden;
     }
 
-    /* Mobile Device Frame Simulation */
     .mobile-frame {
       width: 100%;
       max-width: 430px;
@@ -87,7 +81,6 @@
       }
     }
 
-    /* Header & Status Bar */
     .mobile-status-bar {
       height: 30px;
       background-color: var(--bg-darkest);
@@ -141,7 +134,40 @@
       color: var(--brand-gold);
     }
 
-    /* Screen View Container */
+    /* IN-APP NOTIFICATION TOAST SYSTEM */
+    .inapp-toast {
+      position: absolute;
+      top: -70px;
+      left: 15px;
+      right: 15px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #251b0e;
+      border: 1px solid var(--brand-gold);
+      color: var(--text-white);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 300;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .inapp-toast.show {
+      top: 40px;
+    }
+
+    .inapp-toast.success {
+      border-color: #81c784;
+      background: rgba(30, 60, 35, 0.95);
+    }
+
+    .inapp-toast.error {
+      border-color: #ef9a9a;
+      background: rgba(70, 25, 25, 0.95);
+    }
+
     .view-container {
       flex: 1;
       position: relative;
@@ -177,7 +203,6 @@
       transform: translateY(0);
     }
 
-    /* Typography Defaults */
     h1, h2, h3, h4 {
       font-family: var(--font-heading);
       color: var(--text-white);
@@ -191,7 +216,6 @@
       margin-bottom: 15px;
     }
 
-    /* UI Cards & Containers */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -202,7 +226,6 @@
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     }
 
-    /* Forms & Inputs */
     .form-group {
       margin-bottom: 18px;
       position: relative;
@@ -272,7 +295,6 @@
       padding: 4px;
     }
 
-    /* Buttons */
     .btn {
       width: 100%;
       padding: 14px;
@@ -320,7 +342,6 @@
       color: var(--text-white);
     }
 
-    /* Alert Boxes */
     .alert-box {
       padding: 12px 16px;
       border-radius: 10px;
@@ -342,7 +363,6 @@
       color: #ff8a80;
     }
 
-    /* Loading Spinner */
     .loading-overlay {
       position: absolute;
       top: 0;
@@ -380,7 +400,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Modals */
     .modal-overlay {
       position: absolute;
       top: 0;
@@ -414,7 +433,6 @@
       text-align: left;
     }
 
-    /* Dashboard Components */
     .user-welcome-card {
       background: linear-gradient(135deg, var(--bg-medium) 0%, var(--accent-brown) 100%);
       border-radius: 16px;
@@ -426,7 +444,6 @@
       border: 1px solid var(--card-border);
     }
 
-    /* List Items & Badges */
     .list-item {
       background: var(--card-bg);
       border: 1px solid var(--accent-brown);
@@ -453,7 +470,6 @@
     .badge-approved { background: rgba(46, 125, 50, 0.3); color: #81c784; border: 1px solid #2e7d32; }
     .badge-declined { background: rgba(198, 40, 40, 0.3); color: #ef9a9a; border: 1px solid #c62828; }
 
-    /* Bottom Navigation */
     .bottom-nav {
       position: absolute;
       bottom: 0;
@@ -494,6 +510,12 @@
 
   <!-- Mobile Frame Container -->
   <div class="mobile-frame">
+    
+    <!-- Custom In-App Notification Toast Banner -->
+    <div class="inapp-toast" id="app-toast">
+      <i class="fa-solid fa-circle-check" id="toast-icon" style="font-size: 1.1rem; color: var(--brand-gold);"></i>
+      <span id="toast-message">Notification message here</span>
+    </div>
     
     <!-- Top Mobile Status Bar -->
     <div class="mobile-status-bar">
@@ -755,7 +777,6 @@
           </div>
         </div>
 
-        <!-- Navigation buttons to switch between Queue and Audit Trail -->
         <div style="display: flex; gap: 8px; margin-bottom: 15px;">
           <button class="btn btn-secondary" id="btn-show-queue" style="font-size: 0.75rem; padding: 8px;">
             <i class="fa-solid fa-clipboard-list"></i> Requests Queue
@@ -769,7 +790,6 @@
           <i class="fa-solid fa-clipboard-list"></i> Incoming Requests Queue
         </h4>
 
-        <!-- Request Queue for Admin and Staff -->
         <div id="vet-request-list">
           <p style="font-size: 0.8rem; color: var(--text-muted);">Loading requests...</p>
         </div>
@@ -791,7 +811,6 @@
           </div>
         </div>
 
-        <!-- Quick Actions Grid -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
           <button class="btn btn-primary" id="open-request-modal-btn" style="padding: 10px; font-size: 0.8rem;">
             <i class="fa-solid fa-plus-circle"></i> Request Vaccination
@@ -801,7 +820,6 @@
           </button>
         </div>
 
-        <!-- System Notifications Banner for User -->
         <div class="card" style="padding: 12px; border-color: rgba(212, 163, 89, 0.4); margin-bottom: 15px;">
           <div style="display: flex; align-items: center; gap: 8px; color: var(--brand-gold); font-size: 0.8rem; font-weight: 600;">
             <i class="fa-solid fa-bell"></i> System Notice:
@@ -869,16 +887,34 @@
 
   </div> <!-- End Mobile Frame -->
 
-  <!-- JavaScript App Controller & Connected Supabase Integration -->
   <script>
-    // Supabase Credentials
     const SUPABASE_URL = 'https://kvfnrjuhwbdgqevvuahv.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2Zm5yanVod2JkZ3FldnZ1YWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MTQwODQsImV4cCI6MjEwNzA5MDA4NH0.zuXRrzhviOcYztiDeWaEulSGYck-6GhXG9eLuVCgOGY';
 
-    // Global Client Instance attached to window object
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // Auto-fill login fields on button click
+    // In-App Notification Toast Function
+    window.showInAppToast = function(message, type = 'success') {
+      const toast = document.getElementById('app-toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-message');
+
+      msg.textContent = message;
+      toast.className = `inapp-toast ${type} show`;
+
+      if (type === 'error') {
+        icon.className = 'fa-solid fa-circle-xmark';
+        icon.style.color = '#ff8a80';
+      } else {
+        icon.className = 'fa-solid fa-circle-check';
+        icon.style.color = '#81c784';
+      }
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    };
+
     window.fillLogin = function(email, password) {
       document.getElementById('login-email').value = email;
       document.getElementById('login-password').value = password;
@@ -890,7 +926,6 @@
     document.addEventListener("DOMContentLoaded", function() {
       const supabase = window.supabaseClient;
 
-      // Update System Clock
       function updateClock() {
         const now = new Date();
         document.getElementById('current-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -900,13 +935,11 @@
 
       let currentProfile = null;
 
-      // DOM Elements
       const loadingSpinner = document.getElementById('loading-spinner');
       const logoutModal = document.getElementById('logout-modal');
       const bottomNav = document.getElementById('bottom-navigation');
       const headerLogoutBtn = document.getElementById('header-logout-btn');
 
-      // Views Router Mapping
       const views = {
         login: document.getElementById('view-login'),
         register: document.getElementById('view-register'),
@@ -916,7 +949,6 @@
         vaccines: document.getElementById('view-vaccines')
       };
 
-      // Navigation Function
       function switchView(viewName) {
         Object.keys(views).forEach(key => views[key].classList.remove('active'));
         setTimeout(() => { if (views[viewName]) views[viewName].classList.add('active'); }, 50);
@@ -925,7 +957,6 @@
         bottomNav.style.display = isDashboard ? 'flex' : 'none';
         headerLogoutBtn.style.display = isDashboard ? 'block' : 'none';
 
-        // Set active bottom navigation icon styling
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         if (viewName === 'adminDashboard' || viewName === 'ownerDashboard') {
           document.getElementById('nav-btn-dash').classList.add('active');
@@ -940,7 +971,6 @@
         loadingSpinner.classList.toggle('active', isLoading);
       }
 
-      // Audit Log Function (Records actions to Supabase audit_logs)
       async function logAuditTrail(actionName, actionDetails = {}) {
         if (!currentProfile) return;
         try {
@@ -953,7 +983,6 @@
         } catch(e) { console.error("Audit log error:", e); }
       }
 
-      // Password Toggles
       document.getElementById('toggle-login-password').addEventListener('click', function() {
         const input = document.getElementById('login-password');
         input.type = input.type === 'password' ? 'text' : 'password';
@@ -969,7 +998,7 @@
       document.getElementById('btn-goto-register').addEventListener('click', () => switchView('register'));
       document.getElementById('btn-goto-login').addEventListener('click', () => switchView('login'));
 
-      // 1. SUPABASE LOGIN HANDLER
+      // LOGIN
       document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
@@ -1003,8 +1032,8 @@
           setLoading(false);
 
           await logAuditTrail('USER_LOGIN', { email: email });
+          showInAppToast(`Welcome back, ${currentProfile.full_name}!`, 'success');
 
-          // Route to management view for 'admin' or 'staff', otherwise route to user dashboard
           if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
             document.getElementById('admin-user-name').textContent = currentProfile.full_name;
             
@@ -1033,7 +1062,7 @@
         }
       });
 
-      // 2. SUPABASE REGISTER HANDLER
+      // REGISTER
       document.getElementById('register-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('reg-email').value.trim();
@@ -1061,7 +1090,7 @@
             if (profileError) throw profileError;
 
             setLoading(false);
-            alert("Account registered successfully! You may now sign in.");
+            showInAppToast("Account registered! You may now sign in.", 'success');
             document.getElementById('register-form').reset();
             switchView('login');
           }
@@ -1072,7 +1101,7 @@
         }
       });
 
-      // 3. USER: LOAD OWN VACCINATION REQUESTS
+      // USER: LOAD VACCINATION REQUESTS
       async function loadOwnerRequests() {
         const listContainer = document.getElementById('owner-request-list');
         try {
@@ -1105,7 +1134,7 @@
         } catch (e) { listContainer.innerHTML = 'Error loading requests.'; }
       }
 
-      // 4. ADMIN & STAFF: LOAD ALL INCOMING REQUESTS WITH DELETE BUTTONS
+      // ADMIN & STAFF: LOAD ALL INCOMING REQUESTS
       async function loadVetRequests() {
         document.getElementById('admin-panel-title').innerHTML = '<i class="fa-solid fa-clipboard-list"></i> Incoming Requests Queue';
         const listContainer = document.getElementById('vet-request-list');
@@ -1143,9 +1172,8 @@
         } catch (e) { listContainer.innerHTML = 'Error loading requests.'; }
       }
 
-      // 5. DELETE REQUEST FUNCTION WITH AUDIT TRAIL
+      // DELETE REQUEST
       window.deleteRequest = async function(id) {
-        if (!confirm("Are you sure you want to permanently delete this request?")) return;
         try {
           const { error } = await supabase
             .from('vaccination_requests')
@@ -1154,6 +1182,7 @@
 
           if (!error) {
             await logAuditTrail('DELETE_REQUEST', { request_id: id });
+            showInAppToast('Request deleted successfully', 'success');
             if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
               loadVetRequests();
             } else {
@@ -1162,10 +1191,10 @@
           } else {
             throw error;
           }
-        } catch(e) { alert("Error deleting request: " + e.message); }
+        } catch(e) { showInAppToast("Error deleting request: " + e.message, 'error'); }
       };
 
-      // 6. ADMIN & STAFF: UPDATE STATUS
+      // UPDATE STATUS
       window.updateStatus = async function(id, newStatus) {
         try {
           const { error } = await supabase
@@ -1175,12 +1204,13 @@
 
           if (!error) {
             await logAuditTrail('UPDATE_REQUEST_STATUS', { request_id: id, status: newStatus });
+            showInAppToast(`Request ${newStatus.toLowerCase()}!`, 'success');
             loadVetRequests();
           }
-        } catch(e) { alert("Error updating status."); }
+        } catch(e) { showInAppToast("Error updating status.", 'error'); }
       };
 
-      // 7. USER: SUBMIT VACCINATION REQUEST
+      // SUBMIT VACCINATION REQUEST
       document.getElementById('request-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const payload = {
@@ -1197,12 +1227,13 @@
           if (error) throw error;
 
           await logAuditTrail('SUBMIT_VACCINATION_REQUEST', { tag: payload.animal_tag });
+          showInAppToast('Vaccination request submitted!', 'success');
           document.getElementById('request-modal').classList.remove('active');
           loadOwnerRequests();
-        } catch(e) { alert("Error submitting request: " + e.message); }
+        } catch(e) { showInAppToast("Error submitting request: " + e.message, 'error'); }
       });
 
-      // 8. USER: REGISTER NEW ANIMAL TAG
+      // REGISTER NEW ANIMAL TAG
       document.getElementById('add-animal-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const tag = document.getElementById('new-tag-id').value.trim();
@@ -1219,20 +1250,19 @@
 
           if (error) throw error;
 
-          // Append newly added tag to user request dropdown selector
           const select = document.getElementById('req-animal');
           const opt = document.createElement('option');
           opt.value = tag;
           opt.textContent = `${tag} (${species})`;
           select.appendChild(opt);
 
-          alert(`Animal Tag ${tag} registered successfully!`);
+          showInAppToast(`Animal Tag ${tag} registered successfully!`, 'success');
           document.getElementById('add-animal-modal').classList.remove('active');
           document.getElementById('add-animal-form').reset();
-        } catch(e) { alert("Error registering tag: " + e.message); }
+        } catch(e) { showInAppToast("Error registering tag: " + e.message, 'error'); }
       });
 
-      // 9. LOAD HERD INVENTORY DATA
+      // LOAD HERD INVENTORY
       async function loadHerdData() {
         const container = document.getElementById('herd-list-container');
         try {
@@ -1255,7 +1285,7 @@
         } catch(e) { container.innerHTML = 'Error loading herd inventory.'; }
       }
 
-      // 10. LOAD VACCINES SUPPLIES DATA
+      // LOAD VACCINES SUPPLIES
       async function loadVaccineData() {
         const container = document.getElementById('vaccine-list-container');
         try {
@@ -1278,7 +1308,6 @@
         } catch(e) { container.innerHTML = 'Error loading vaccine supplies.'; }
       }
 
-      // Bottom Nav Click Handlers
       document.getElementById('nav-btn-dash').addEventListener('click', () => {
         if (currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet')) {
           switchView('adminDashboard');
@@ -1297,7 +1326,6 @@
         loadVaccineData();
       });
 
-      // Audit Log Trail View Trigger
       document.getElementById('btn-show-logs').addEventListener('click', async function() {
         document.getElementById('admin-panel-title').innerHTML = '<i class="fa-solid fa-list-check"></i> System Audit Log Trail';
         const listContainer = document.getElementById('vet-request-list');
@@ -1325,7 +1353,6 @@
 
       document.getElementById('btn-show-queue').addEventListener('click', loadVetRequests);
 
-      // Modal Controls
       document.getElementById('open-request-modal-btn').addEventListener('click', () => {
         document.getElementById('request-modal').classList.add('active');
       });
@@ -1340,7 +1367,6 @@
         document.getElementById('add-animal-modal').classList.remove('active');
       });
 
-      // Logout Handlers
       document.querySelectorAll('.logout-trigger').forEach(el => {
         el.addEventListener('click', () => logoutModal.classList.add('active'));
       });
@@ -1354,6 +1380,7 @@
         await supabase.auth.signOut();
         currentProfile = null;
         document.getElementById('login-form').reset();
+        showInAppToast('Successfully signed out.', 'success');
         switchView('login');
       });
     });
