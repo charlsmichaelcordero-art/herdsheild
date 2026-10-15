@@ -8,7 +8,7 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Google Fonts: Poppins (Headings) & Open Sans (Body) -->
+  <!-- Google Fonts: Poppins & Open Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
@@ -46,6 +46,12 @@
       padding: 0;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Enable text selection and copy/paste for inputs, toast banners, and modals */
+    input, textarea, select, .inapp-toast, .modal-box, .form-control {
+      user-select: text !important;
+      -webkit-user-select: text !important;
     }
 
     body {
@@ -134,10 +140,9 @@
       color: var(--brand-gold);
     }
 
-    /* IN-APP NOTIFICATION TOAST SYSTEM */
     .inapp-toast {
       position: absolute;
-      top: -70px;
+      top: -90px;
       left: 15px;
       right: 15px;
       padding: 12px 16px;
@@ -145,7 +150,7 @@
       background: #251b0e;
       border: 1px solid var(--brand-gold);
       color: var(--text-white);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -257,7 +262,7 @@
 
     .form-control {
       width: 100%;
-      padding: 12px 14px 12px 42px;
+      padding: 12px 42px 12px 42px;
       background-color: var(--input-bg);
       border: 1px solid var(--accent-brown);
       border-radius: 10px;
@@ -293,6 +298,7 @@
       color: var(--text-muted);
       cursor: pointer;
       padding: 4px;
+      z-index: 5;
     }
 
     .btn {
@@ -351,7 +357,7 @@
       padding: 12px 16px;
       border-radius: 10px;
       margin-bottom: 16px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       display: none;
       align-items: center;
       gap: 10px;
@@ -374,7 +380,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(24, 17, 9, 0.8);
+      background: rgba(24, 17, 9, 0.85);
       backdrop-filter: blur(4px);
       display: flex;
       flex-direction: column;
@@ -411,7 +417,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(5px);
       display: flex;
       justify-content: center;
@@ -434,7 +440,7 @@
       border-radius: 20px;
       padding: 24px;
       width: 100%;
-      max-width: 340px;
+      max-width: 350px;
       text-align: left;
     }
 
@@ -447,17 +453,6 @@
       justify-content: space-between;
       margin-bottom: 20px;
       border: 1px solid var(--card-border);
-    }
-
-    .list-item {
-      background: var(--card-bg);
-      border: 1px solid var(--accent-brown);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
     .badge {
@@ -506,6 +501,13 @@
       color: var(--brand-gold);
     }
 
+    .password-rules {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-5deg); }
       to { opacity: 1; transform: translateY(0); }
@@ -525,7 +527,7 @@
     
     <!-- Top Mobile Status Bar -->
     <div class="mobile-status-bar">
-      <span><i class="fa-solid fa-wifi"></i> HerdShield Supabase</span>
+      <span><i class="fa-solid fa-wifi"></i> HerdShield IAS System</span>
       <span id="current-time">12:00 PM</span>
     </div>
 
@@ -537,9 +539,91 @@
         </div>
         <div class="brand-name">Herd<span>Shield</span></div>
       </div>
-      <button class="btn btn-secondary logout-trigger" id="header-logout-btn" style="width: auto; padding: 6px 12px; font-size: 0.8rem; display: none;">
-        <i class="fa-solid fa-right-from-bracket"></i> Logout
-      </button>
+      <div style="display: flex; gap: 6px;">
+        <button class="btn btn-secondary" id="header-profile-btn" style="width: auto; padding: 6px 10px; font-size: 0.75rem; display: none;">
+          <i class="fa-solid fa-user-pen"></i> Profile
+        </button>
+        <button class="btn btn-secondary logout-trigger" id="header-logout-btn" style="width: auto; padding: 6px 10px; font-size: 0.75rem; display: none;">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- OTP Account Recovery Modal -->
+    <div class="modal-overlay" id="otp-modal">
+      <div class="modal-box">
+        <h3 style="margin-bottom: 8px;"><i class="fa-solid fa-key" style="color: var(--brand-gold);"></i> Account Recovery</h3>
+        <p style="font-size: 0.75rem; margin-bottom: 12px;">Reset your password using an OTP security code.</p>
+        
+        <!-- Step 1: Send OTP -->
+        <div id="otp-step-1">
+          <div class="form-group">
+            <label class="form-label">Registered Email</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-envelope input-icon"></i>
+              <input type="email" class="form-control" id="otp-email-input" placeholder="user@herdshield.com">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btn-send-otp">Request Security OTP</button>
+        </div>
+
+        <!-- Step 2: Verify OTP & Reset Password -->
+        <div id="otp-step-2" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Enter 6-Digit OTP</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-shield-halved input-icon"></i>
+              <input type="text" class="form-control" id="otp-code-input" maxlength="6" placeholder="123456">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" class="form-control" id="otp-new-pass" placeholder="Min 8 chars (A-z, 0-9, @#$)">
+              <i class="fa-solid fa-eye password-toggle" id="toggle-otp-new-pass"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" class="form-control" id="otp-confirm-pass" placeholder="Confirm new password">
+              <i class="fa-solid fa-eye password-toggle" id="toggle-otp-confirm-pass"></i>
+            </div>
+          </div>
+          <button class="btn btn-success" id="btn-verify-reset-otp">Verify OTP & Reset Password</button>
+        </div>
+
+        <button class="btn btn-secondary" id="btn-close-otp-modal" style="margin-top: 10px;">Cancel</button>
+      </div>
+    </div>
+
+    <!-- User Profile CRUD Modal -->
+    <div class="modal-overlay" id="profile-modal">
+      <div class="modal-box">
+        <h3 style="margin-bottom: 12px;"><i class="fa-solid fa-user-gear" style="color: var(--brand-gold);"></i> Edit User Profile</h3>
+        <form id="profile-edit-form">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-id-card input-icon"></i>
+              <input type="text" class="form-control" id="edit-fullname" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user input-icon"></i>
+              <input type="text" class="form-control" id="edit-username" required>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="button" class="btn btn-secondary" id="cancel-profile-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Approve & Schedule Vaccination Modal -->
@@ -700,28 +784,35 @@
           </button>
         </form>
 
-        <div style="text-align: center; margin-top: 25px;">
+        <div style="text-align: center; margin-top: 18px;">
+          <button class="btn btn-outline" id="btn-open-otp-modal" style="border: none; color: var(--brand-gold); text-decoration: underline; background: transparent; padding: 4px; font-size: 0.8rem;">
+            Forgot Password? Recover via OTP
+          </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
           <p>Don't have an account yet?</p>
           <button class="btn btn-outline" id="btn-goto-register">Create Account</button>
         </div>
 
-        <!-- Quick Select Demo Buttons -->
-        <div class="card" style="margin-top: 20px; border-style: dashed;">
-          <h4 style="font-size: 0.85rem; color: var(--brand-gold); margin-bottom: 10px;">
-            <i class="fa-solid fa-key"></i> Quick Fill Credentials:
-          </h4>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('admin@herdshield.com', 'AdminPass123!')">
-              <i class="fa-solid fa-user-gear"></i> Fill Admin
-            </button>
-            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('staff@herdshield.com', 'StaffPass123!')">
-              <i class="fa-solid fa-user-doctor"></i> Fill Staff
-            </button>
-            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('user@herdshield.com', 'UserPass123!')">
-              <i class="fa-solid fa-wheat-awn"></i> Fill User
-            </button>
-          </div>
-        </div>
+        <!-- Quick Select Demo Credentials -->
+        <!-- Quick Select Demo Credentials -->
+<div class="card" style="margin-top: 20px; border-style: dashed;">
+  <h4 style="font-size: 0.85rem; color: var(--brand-gold); margin-bottom: 10px;">
+    <i class="fa-solid fa-key"></i> Quick Fill Credentials:
+  </h4>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c@gmail.com', 'Password@123')">
+      <i class="fa-solid fa-user-gear"></i> Fill Admin
+    </button>
+    <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c1@gmail.com', 'Password@123')">
+      <i class="fa-solid fa-user-doctor"></i> Fill Staff
+    </button>
+    <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c2@gmail.com', 'Password@123')">
+      <i class="fa-solid fa-wheat-awn"></i> Fill User
+    </button>
+  </div>
+</div>
 
       </div>
 
@@ -778,8 +869,20 @@
             <label class="form-label">Password</label>
             <div class="input-wrapper">
               <i class="fa-solid fa-lock input-icon"></i>
-              <input type="password" class="form-control" id="reg-password" placeholder="At least 6 characters" required>
+              <input type="password" class="form-control" id="reg-password" placeholder="Min 8 chars" required>
               <i class="fa-solid fa-eye password-toggle" id="toggle-reg-password"></i>
+            </div>
+            <div class="password-rules">
+              Must contain 8+ chars, uppercase & lowercase letters, a number, and a special character (!@#$%^&*).
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" class="form-control" id="reg-confirm-password" placeholder="Repeat password" required>
+              <i class="fa-solid fa-eye password-toggle" id="toggle-reg-confirm-password"></i>
             </div>
           </div>
 
@@ -921,6 +1024,7 @@
 
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
+    // In-App Toast System
     window.showInAppToast = function(message, type = 'success') {
       const toast = document.getElementById('app-toast');
       const icon = document.getElementById('toast-icon');
@@ -937,7 +1041,7 @@
         icon.style.color = '#81c784';
       }
 
-      setTimeout(() => { toast.classList.remove('show'); }, 3000);
+      setTimeout(() => { toast.classList.remove('show'); }, 5000);
     };
 
     window.fillLogin = function(email, password) {
@@ -946,6 +1050,31 @@
       if (navigator.clipboard) {
         navigator.clipboard.writeText(`${email} | ${password}`);
       }
+    };
+
+    // Password Complexity Validation Rule
+    function validatePasswordComplexity(password) {
+      const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+      return re.test(password);
+    }
+
+    // Toggle Helper Function for Eye Icons
+    function setupPasswordToggle(toggleId, inputId) {
+      const toggleBtn = document.getElementById(toggleId);
+      const inputField = document.getElementById(inputId);
+      if (toggleBtn && inputField) {
+        toggleBtn.addEventListener('click', function() {
+          inputField.type = inputField.type === 'password' ? 'text' : 'password';
+          this.classList.toggle('fa-eye-slash');
+        });
+      }
+    }
+
+    // Demo Account Provisions Table
+    const DEMO_ACCOUNTS = {
+      'admin@herdshield.com': { full_name: 'System Administrator', username: 'admin_hero', role: 'admin' },
+      'staff@herdshield.com': { full_name: 'Dr. Sarah Connor', username: 'vet_staff', role: 'staff' },
+      'user@herdshield.com': { full_name: 'John Doe', username: 'farmer_john', role: 'user' }
     };
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -959,11 +1088,13 @@
       updateClock();
 
       let currentProfile = null;
+      let recoveryEmail = '';
 
       const loadingSpinner = document.getElementById('loading-spinner');
       const logoutModal = document.getElementById('logout-modal');
       const bottomNav = document.getElementById('bottom-navigation');
       const headerLogoutBtn = document.getElementById('header-logout-btn');
+      const headerProfileBtn = document.getElementById('header-profile-btn');
 
       const views = {
         login: document.getElementById('view-login'),
@@ -981,6 +1112,7 @@
         const isDashboard = ['adminDashboard', 'ownerDashboard', 'herd', 'vaccines'].includes(viewName);
         bottomNav.style.display = isDashboard ? 'flex' : 'none';
         headerLogoutBtn.style.display = isDashboard ? 'block' : 'none';
+        headerProfileBtn.style.display = isDashboard ? 'block' : 'none';
 
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         if (viewName === 'adminDashboard' || viewName === 'ownerDashboard') {
@@ -996,6 +1128,7 @@
         loadingSpinner.classList.toggle('active', isLoading);
       }
 
+      // Audit Trail Logger
       async function logAuditTrail(actionName, actionDetails = {}) {
         if (!currentProfile) return;
         try {
@@ -1008,94 +1141,135 @@
         } catch(e) { console.error("Audit log error:", e); }
       }
 
-      document.getElementById('toggle-login-password').addEventListener('click', function() {
-        const input = document.getElementById('login-password');
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye-slash');
-      });
-
-      document.getElementById('toggle-reg-password').addEventListener('click', function() {
-        const input = document.getElementById('reg-password');
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('fa-eye-slash');
-      });
+      // Password Toggle Bindings
+      setupPasswordToggle('toggle-login-password', 'login-password');
+      setupPasswordToggle('toggle-reg-password', 'reg-password');
+      setupPasswordToggle('toggle-reg-confirm-password', 'reg-confirm-password');
+      setupPasswordToggle('toggle-otp-new-pass', 'otp-new-pass');
+      setupPasswordToggle('toggle-otp-confirm-pass', 'otp-confirm-pass');
 
       document.getElementById('btn-goto-register').addEventListener('click', () => switchView('register'));
       document.getElementById('btn-goto-login').addEventListener('click', () => switchView('login'));
 
-      // LOGIN
-      document.getElementById('login-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-        const alertBox = document.getElementById('login-alert');
-        const alertText = document.getElementById('login-alert-text');
+      // LOGIN WITH AUTO-PROVISIONING FOR DEMO ACCOUNTS
+      // LOGIN HANDLER
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const alertBox = document.getElementById('login-alert');
+  const alertText = document.getElementById('login-alert-text');
 
-        if (!email || !password) {
-          alertText.textContent = "Please fill in all fields.";
-          alertBox.classList.add('show');
-          return;
-        }
+  if (!email || !password) {
+    alertText.textContent = "Please fill in all email and password fields.";
+    alertBox.classList.add('show');
+    return;
+  }
 
-        alertBox.classList.remove('show');
-        setLoading(true);
+  alertBox.classList.remove('show');
+  setLoading(true);
 
-        try {
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+  try {
+    // Check lockout state in profiles table
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
 
-          if (authError) throw authError;
+    if (userProfile && userProfile.lockout_until) {
+      const lockoutTime = new Date(userProfile.lockout_until);
+      if (new Date() < lockoutTime) {
+        const remainingSeconds = Math.ceil((lockoutTime - new Date()) / 1000);
+        setLoading(false);
+        alertText.textContent = `Account locked due to failed attempts. Retry in ${remainingSeconds}s.`;
+        alertBox.classList.add('show');
+        return;
+      } else {
+        await supabase.from('profiles').update({ failed_attempts: 0, lockout_until: null }).eq('id', userProfile.id);
+      }
+    }
 
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
+    // Authenticate user via Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-          if (profileError || !profile) throw new Error("Profile record not found.");
+    if (authError) {
+      let currentFails = userProfile ? (userProfile.failed_attempts || 0) + 1 : 1;
+      let newLockout = null;
 
-          currentProfile = profile;
-          setLoading(false);
+      if (currentFails >= 3) {
+        const penaltyMinutes = currentFails === 3 ? 1 : currentFails === 4 ? 3 : 5;
+        newLockout = new Date(Date.now() + penaltyMinutes * 60000).toISOString();
+      }
 
-          await logAuditTrail('USER_LOGIN', { email: email });
-          showInAppToast(`Welcome back, ${currentProfile.full_name}!`, 'success');
+      if (userProfile) {
+        await supabase.from('profiles').update({
+          failed_attempts: currentFails,
+          lockout_until: newLockout
+        }).eq('id', userProfile.id);
+      }
 
-          if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
-            document.getElementById('admin-user-name').textContent = currentProfile.full_name;
-            
-            const roleBadge = document.getElementById('admin-user-role');
-            const logsBtn = document.getElementById('btn-show-logs');
+      throw new Error(currentFails >= 3 
+        ? `3 Failed attempts reached! Account temporarily locked.` 
+        : `Invalid login credentials. Failed attempts: ${currentFails}/3`);
+    }
 
-            if (currentProfile.role === 'admin') {
-              roleBadge.textContent = 'System Administrator';
-              roleBadge.className = 'badge badge-admin';
-              logsBtn.style.display = 'block'; // Only visible for Admin
-            } else {
-              roleBadge.textContent = 'Veterinarian / Staff';
-              roleBadge.className = 'badge badge-staff';
-              logsBtn.style.display = 'none'; // Hidden for Staff
-            }
+    // Retrieve corresponding user profile details
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
 
-            switchView('adminDashboard');
-            loadVetRequests();
-          } else {
-            document.getElementById('owner-user-name').textContent = currentProfile.full_name;
-            document.getElementById('owner-user-role').textContent = 'Livestock Owner';
-            document.getElementById('owner-user-role').className = 'badge badge-user';
-            switchView('ownerDashboard');
-            loadOwnerRequests();
-          }
-        } catch (err) {
-          setLoading(false);
-          alertText.textContent = err.message || "Login failed.";
-          alertBox.classList.add('show');
-        }
-      });
+    if (profileError || !profile) throw new Error("Profile record not found.");
 
-      // REGISTER
+    currentProfile = profile;
+
+    await supabase.from('profiles').update({ failed_attempts: 0, lockout_until: null }).eq('id', currentProfile.id);
+
+    setLoading(false);
+
+    await logAuditTrail('USER_LOGIN', { email: email });
+    showInAppToast(`Welcome back, ${currentProfile.full_name}!`, 'success');
+
+    if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
+      document.getElementById('admin-user-name').textContent = currentProfile.full_name;
+      
+      const roleBadge = document.getElementById('admin-user-role');
+      const logsBtn = document.getElementById('btn-show-logs');
+
+      if (currentProfile.role === 'admin') {
+        roleBadge.textContent = 'System Administrator';
+        roleBadge.className = 'badge badge-admin';
+        logsBtn.style.display = 'block';
+      } else {
+        roleBadge.textContent = 'Veterinarian / Staff';
+        roleBadge.className = 'badge badge-staff';
+        logsBtn.style.display = 'none';
+      }
+
+      switchView('adminDashboard');
+      loadVetRequests();
+    } else {
+      document.getElementById('owner-user-name').textContent = currentProfile.full_name;
+      document.getElementById('owner-user-role').textContent = 'Livestock Owner';
+      document.getElementById('owner-user-role').className = 'badge badge-user';
+      switchView('ownerDashboard');
+      loadOwnerRequests();
+    }
+  } catch (err) {
+    setLoading(false);
+    alertText.textContent = err.message || "Login failed.";
+    alertBox.classList.add('show');
+  }
+});
+
+      // REGISTER WITH EMAIL, PASSWORD & PROFILES UPSERT
       document.getElementById('register-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-password').value.trim();
+        const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
         const full_name = document.getElementById('reg-fullname').value.trim();
         const username = document.getElementById('reg-username').value.trim();
         const role = document.getElementById('reg-role').value;
@@ -1104,6 +1278,19 @@
         const alertText = document.getElementById('register-alert-text');
 
         alertBox.classList.remove('show');
+
+        if (password !== confirmPassword) {
+          alertText.textContent = "Passwords do not match. Please verify.";
+          alertBox.classList.add('show');
+          return;
+        }
+
+        if (!validatePasswordComplexity(password)) {
+          alertText.textContent = "Password must be 8+ chars with upper/lowercase, numbers & special characters.";
+          alertBox.classList.add('show');
+          return;
+        }
+
         setLoading(true);
 
         try {
@@ -1112,9 +1299,22 @@
           if (authError) throw authError;
 
           if (authData.user) {
-            const { error: profileError } = await supabase.from('profiles').insert([
-              { id: authData.user.id, full_name, username, role }
-            ]);
+            if (authData.user.identities && authData.user.identities.length === 0) {
+              throw new Error("This email address is already registered. Please sign in instead.");
+            }
+
+            const { error: profileError } = await supabase.from('profiles').upsert([
+              { 
+                id: authData.user.id, 
+                full_name, 
+                username, 
+                email, 
+                password, 
+                role, 
+                failed_attempts: 0,
+                lockout_until: null
+              }
+            ], { onConflict: 'id' });
 
             if (profileError) throw profileError;
 
@@ -1130,7 +1330,130 @@
         }
       });
 
-      // OPEN SCHEDULE MODAL FOR APPROVAL
+      // OTP ACCOUNT RECOVERY FLOW
+      document.getElementById('btn-open-otp-modal').addEventListener('click', () => {
+        document.getElementById('otp-step-1').style.display = 'block';
+        document.getElementById('otp-step-2').style.display = 'none';
+        document.getElementById('otp-modal').classList.add('active');
+      });
+
+      document.getElementById('btn-close-otp-modal').addEventListener('click', () => {
+        document.getElementById('otp-modal').classList.remove('active');
+      });
+
+      // Request OTP
+      document.getElementById('btn-send-otp').addEventListener('click', async () => {
+        const email = document.getElementById('otp-email-input').value.trim();
+        if (!email) {
+          showInAppToast("Please enter your registered email.", "error");
+          return;
+        }
+
+        const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 5 * 60000).toISOString();
+
+        try {
+          const { error } = await supabase.from('otp_codes').insert([{
+            email: email,
+            otp_code: generatedOTP,
+            expires_at: expiresAt,
+            is_used: false
+          }]);
+
+          if (error) throw error;
+
+          recoveryEmail = email;
+          showInAppToast(`OTP Sent to ${email}! [Code: ${generatedOTP}]`, 'success');
+
+          document.getElementById('otp-step-1').style.display = 'none';
+          document.getElementById('otp-step-2').style.display = 'block';
+        } catch(e) { showInAppToast("Error generating OTP: " + e.message, 'error'); }
+      });
+
+      // Verify OTP & Reset Password
+      document.getElementById('btn-verify-reset-otp').addEventListener('click', async () => {
+        const otpCode = document.getElementById('otp-code-input').value.trim();
+        const newPass = document.getElementById('otp-new-pass').value.trim();
+        const confirmPass = document.getElementById('otp-confirm-pass').value.trim();
+
+        if (newPass !== confirmPass) {
+          showInAppToast("New passwords do not match.", "error");
+          return;
+        }
+
+        if (!validatePasswordComplexity(newPass)) {
+          showInAppToast("Password must meet complexity rules (8+ chars, mix case, numbers, symbols).", "error");
+          return;
+        }
+
+        try {
+          const { data: otpRecords, error: otpErr } = await supabase
+            .from('otp_codes')
+            .select('*')
+            .eq('email', recoveryEmail)
+            .eq('otp_code', otpCode)
+            .eq('is_used', false)
+            .order('created_at', { ascending: false });
+
+          if (otpErr || !otpRecords || otpRecords.length === 0) {
+            throw new Error("Invalid or expired OTP code.");
+          }
+
+          const validRecord = otpRecords[0];
+          if (new Date() > new Date(validRecord.expires_at)) {
+            throw new Error("OTP code has expired. Request a new one.");
+          }
+
+          await supabase.from('otp_codes').update({ is_used: true }).eq('id', validRecord.id);
+
+          await supabase.from('profiles').update({ password: newPass, failed_attempts: 0, lockout_until: null }).eq('email', recoveryEmail);
+
+          showInAppToast("OTP verified! Password reset in DB. Please login.", 'success');
+          document.getElementById('otp-modal').classList.remove('active');
+        } catch(e) { showInAppToast("OTP Reset Error: " + e.message, 'error'); }
+      });
+
+      // USER PROFILE CRUD MANAGEMENT
+      headerProfileBtn.addEventListener('click', () => {
+        if (!currentProfile) return;
+        document.getElementById('edit-fullname').value = currentProfile.full_name;
+        document.getElementById('edit-username').value = currentProfile.username;
+        document.getElementById('profile-modal').classList.add('active');
+      });
+
+      document.getElementById('cancel-profile-btn').addEventListener('click', () => {
+        document.getElementById('profile-modal').classList.remove('active');
+      });
+
+      document.getElementById('profile-edit-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const newFullName = document.getElementById('edit-fullname').value.trim();
+        const newUsername = document.getElementById('edit-username').value.trim();
+
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .update({ full_name: newFullName, username: newUsername, updated_at: new Date().toISOString() })
+            .eq('id', currentProfile.id);
+
+          if (error) throw error;
+
+          currentProfile.full_name = newFullName;
+          currentProfile.username = newUsername;
+
+          await logAuditTrail('UPDATE_USER_PROFILE', { updated_fields: { full_name: newFullName, username: newUsername } });
+          showInAppToast('Profile details updated successfully!', 'success');
+          document.getElementById('profile-modal').classList.remove('active');
+
+          if (currentProfile.role === 'admin' || currentProfile.role === 'staff') {
+            document.getElementById('admin-user-name').textContent = currentProfile.full_name;
+          } else {
+            document.getElementById('owner-user-name').textContent = currentProfile.full_name;
+          }
+        } catch(e) { showInAppToast("Profile update failed: " + e.message, 'error'); }
+      });
+
+      // OPEN SCHEDULE MODAL
       window.openScheduleModal = function(requestId) {
         document.getElementById('sched-request-id').value = requestId;
         document.getElementById('schedule-modal').classList.add('active');
@@ -1289,10 +1612,10 @@
         } catch (e) { listContainer.innerHTML = 'Error loading requests.'; }
       }
 
-      // DELETE REQUEST (ADMIN ONLY)
+      // DELETE REQUEST
       window.deleteRequest = async function(id) {
-        if (currentProfile && currentProfile.role !== 'admin') {
-          showInAppToast('Only admins can delete/archive requests.', 'error');
+        if (currentProfile && currentProfile.role !== 'admin' && currentProfile.role !== 'user') {
+          showInAppToast('Only admins or the request owner can delete requests.', 'error');
           return;
         }
 
@@ -1378,6 +1701,7 @@
           opt.textContent = `${tag} (${species})`;
           select.appendChild(opt);
 
+          await logAuditTrail('REGISTER_LIVESTOCK', { animal_tag: tag, species: species });
           showInAppToast(`Animal Tag ${tag} registered successfully!`, 'success');
           document.getElementById('add-animal-modal').classList.remove('active');
           document.getElementById('add-animal-form').reset();
@@ -1448,9 +1772,12 @@
         loadVaccineData();
       });
 
-      // AUDIT LOG TRAIL (ONLY FOR ADMIN)
+      // AUDIT LOG TRAIL (ADMIN ONLY VIEW)
       document.getElementById('btn-show-logs').addEventListener('click', async function() {
-        if (!currentProfile || currentProfile.role !== 'admin') return;
+        if (!currentProfile || currentProfile.role !== 'admin') {
+          showInAppToast('Access Denied: Only Admin can view Audit Logs.', 'error');
+          return;
+        }
 
         document.getElementById('admin-panel-title').innerHTML = '<i class="fa-solid fa-list-check"></i> System Audit Log Trail';
         const listContainer = document.getElementById('vet-request-list');
@@ -1497,6 +1824,8 @@
       });
 
       document.getElementById('modal-cancel-btn').addEventListener('click', () => logoutModal.classList.remove('active'));
+      
+      // LOGOUT & SESSION DESTRUCTION
       document.getElementById('modal-confirm-btn').addEventListener('click', async function() {
         logoutModal.classList.remove('active');
         if (currentProfile) {
@@ -1505,7 +1834,7 @@
         await supabase.auth.signOut();
         currentProfile = null;
         document.getElementById('login-form').reset();
-        showInAppToast('Successfully signed out.', 'success');
+        showInAppToast('Successfully signed out session.', 'success');
         switchView('login');
       });
     });
