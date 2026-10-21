@@ -48,7 +48,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Enable text selection and copy/paste for inputs, toast banners, and modals */
+    /* Enable text selection for inputs, toast banners, and modals */
     input, textarea, select, .inapp-toast, .modal-box, .form-control {
       user-select: text !important;
       -webkit-user-select: text !important;
@@ -63,8 +63,10 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      padding: 10px;
     }
 
+    /* Default Mobile Frame UI (Used for Login, Register, User, & Staff) */
     .mobile-frame {
       width: 100%;
       max-width: 430px;
@@ -77,18 +79,29 @@
       flex-direction: column;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
       border: 1px solid var(--accent-brown);
+      transition: max-width 0.4s ease, height 0.4s ease, border-radius 0.4s ease;
     }
 
     @media (min-width: 480px) {
-      .mobile-frame {
+      .mobile-frame:not(.admin-web-ui) {
         height: 880px;
         border-radius: 40px;
         border: 8px solid #2a1e12;
       }
     }
 
+    /* Webpage Layout Mode - Applied ONLY when logged in as Admin */
+    .mobile-frame.admin-web-ui {
+      max-width: 1150px;
+      height: 860px;
+      max-height: 92vh;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.85);
+    }
+
     .mobile-status-bar {
-      height: 30px;
+      height: 32px;
       background-color: var(--bg-darkest);
       display: flex;
       justify-content: space-between;
@@ -97,6 +110,7 @@
       font-size: 0.75rem;
       color: var(--text-muted);
       z-index: 10;
+      border-bottom: 1px solid rgba(212, 163, 89, 0.1);
     }
 
     .app-header {
@@ -182,7 +196,7 @@
     }
 
     .view-container::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
     .view-container::-webkit-scrollbar-thumb {
       background: var(--accent-brown);
@@ -229,6 +243,21 @@
       margin-bottom: 16px;
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Grid view transformation ONLY inside Admin Webpage UI */
+    .mobile-frame.admin-web-ui #vet-request-list,
+    .mobile-frame.admin-web-ui #herd-list-container,
+    .mobile-frame.admin-web-ui #vaccine-list-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .mobile-frame.admin-web-ui #vet-request-list .card,
+    .mobile-frame.admin-web-ui #herd-list-container .card,
+    .mobile-frame.admin-web-ui #vaccine-list-container .card {
+      margin-bottom: 0;
     }
 
     .form-group {
@@ -440,7 +469,7 @@
       border-radius: 20px;
       padding: 24px;
       width: 100%;
-      max-width: 350px;
+      max-width: 380px;
       text-align: left;
     }
 
@@ -516,8 +545,8 @@
 </head>
 <body>
 
-  <!-- Mobile Frame Container -->
-  <div class="mobile-frame">
+  <!-- Mobile/Web Dynamic Container -->
+  <div class="mobile-frame" id="app-frame">
     
     <!-- Custom In-App Notification Toast Banner -->
     <div class="inapp-toast" id="app-toast">
@@ -525,7 +554,7 @@
       <span id="toast-message">Notification message here</span>
     </div>
     
-    <!-- Top Mobile Status Bar -->
+    <!-- Top Mobile/System Status Bar -->
     <div class="mobile-status-bar">
       <span><i class="fa-solid fa-wifi"></i> HerdShield IAS System</span>
       <span id="current-time">12:00 PM</span>
@@ -749,7 +778,7 @@
     <!-- Main View Container -->
     <div class="view-container">
 
-      <!-- VIEW 1: LOGIN SCREEN -->
+      <!-- VIEW 1: LOGIN SCREEN (MOBILE UI) -->
       <div class="app-view active" id="view-login">
         <div style="text-align: center; margin-top: 10px; margin-bottom: 25px;">
           <h2 style="font-size: 1.5rem;">Welcome Back</h2>
@@ -796,27 +825,26 @@
         </div>
 
         <!-- Quick Select Demo Credentials -->
-        <!-- Quick Select Demo Credentials -->
-<div class="card" style="margin-top: 20px; border-style: dashed;">
-  <h4 style="font-size: 0.85rem; color: var(--brand-gold); margin-bottom: 10px;">
-    <i class="fa-solid fa-key"></i> Quick Fill Credentials:
-  </h4>
-  <div style="display: flex; flex-direction: column; gap: 8px;">
-    <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c@gmail.com', 'Password@123')">
-      <i class="fa-solid fa-user-gear"></i> Fill Admin
-    </button>
-    <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c1@gmail.com', 'Password@123')">
-      <i class="fa-solid fa-user-doctor"></i> Fill Staff
-    </button>
-    <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c2@gmail.com', 'Password@123')">
-      <i class="fa-solid fa-wheat-awn"></i> Fill User
-    </button>
-  </div>
-</div>
+        <div class="card" style="margin-top: 20px; border-style: dashed;">
+          <h4 style="font-size: 0.85rem; color: var(--brand-gold); margin-bottom: 10px;">
+            <i class="fa-solid fa-key"></i> Quick Fill Credentials:
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c@gmail.com', 'Password@123')">
+              <i class="fa-solid fa-user-gear"></i> Fill Admin (Webpage UI)
+            </button>
+            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c1@gmail.com', 'Password@123')">
+              <i class="fa-solid fa-user-doctor"></i> Fill Staff (Mobile UI)
+            </button>
+            <button type="button" class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="fillLogin('c2@gmail.com', 'Password@123')">
+              <i class="fa-solid fa-wheat-awn"></i> Fill User (Mobile UI)
+            </button>
+          </div>
+        </div>
 
       </div>
 
-      <!-- VIEW 2: REGISTER SCREEN -->
+      <!-- VIEW 2: REGISTER SCREEN (MOBILE UI) -->
       <div class="app-view" id="view-register">
         <div style="text-align: center; margin-bottom: 20px;">
           <h2>Create Account</h2>
@@ -909,10 +937,10 @@
         </div>
 
         <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-          <button class="btn btn-secondary" id="btn-show-queue" style="font-size: 0.75rem; padding: 8px;">
+          <button class="btn btn-secondary" id="btn-show-queue" style="font-size: 0.75rem; padding: 8px; width: auto;">
             <i class="fa-solid fa-clipboard-list"></i> Requests Queue
           </button>
-          <button class="btn btn-outline" id="btn-show-logs" style="font-size: 0.75rem; padding: 8px; display: none;">
+          <button class="btn btn-outline" id="btn-show-logs" style="font-size: 0.75rem; padding: 8px; width: auto; display: none;">
             <i class="fa-solid fa-list-check"></i> Audit Log Trail
           </button>
         </div>
@@ -925,12 +953,12 @@
           <p style="font-size: 0.8rem; color: var(--text-muted);">Loading requests...</p>
         </div>
 
-        <button class="btn btn-danger logout-trigger" style="margin-top: 25px;">
+        <button class="btn btn-danger logout-trigger" style="margin-top: 25px; width: auto;">
           <i class="fa-solid fa-right-from-bracket"></i> Logout / Sign Out
         </button>
       </div>
 
-      <!-- VIEW 3B: USER DASHBOARD -->
+      <!-- VIEW 3B: USER DASHBOARD (MOBILE UI) -->
       <div class="app-view" id="view-owner-dashboard">
         <div class="user-welcome-card">
           <div>
@@ -1070,15 +1098,9 @@
       }
     }
 
-    // Demo Account Provisions Table
-    const DEMO_ACCOUNTS = {
-      'admin@herdshield.com': { full_name: 'System Administrator', username: 'admin_hero', role: 'admin' },
-      'staff@herdshield.com': { full_name: 'Dr. Sarah Connor', username: 'vet_staff', role: 'staff' },
-      'user@herdshield.com': { full_name: 'John Doe', username: 'farmer_john', role: 'user' }
-    };
-
     document.addEventListener("DOMContentLoaded", function() {
       const supabase = window.supabaseClient;
+      const appFrame = document.getElementById('app-frame');
 
       function updateClock() {
         const now = new Date();
@@ -1106,6 +1128,13 @@
       };
 
       function switchView(viewName) {
+        // ENFORCE WEBPAGE UI ONLY FOR ADMIN DASHBOARD
+        if (currentProfile && currentProfile.role === 'admin' && ['adminDashboard', 'herd', 'vaccines'].includes(viewName)) {
+          appFrame.classList.add('admin-web-ui');
+        } else {
+          appFrame.classList.remove('admin-web-ui');
+        }
+
         Object.keys(views).forEach(key => views[key].classList.remove('active'));
         setTimeout(() => { if (views[viewName]) views[viewName].classList.add('active'); }, 50);
 
@@ -1151,118 +1180,117 @@
       document.getElementById('btn-goto-register').addEventListener('click', () => switchView('register'));
       document.getElementById('btn-goto-login').addEventListener('click', () => switchView('login'));
 
-      // LOGIN WITH AUTO-PROVISIONING FOR DEMO ACCOUNTS
       // LOGIN HANDLER
-document.getElementById('login-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  const alertBox = document.getElementById('login-alert');
-  const alertText = document.getElementById('login-alert-text');
+      document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        const alertBox = document.getElementById('login-alert');
+        const alertText = document.getElementById('login-alert-text');
 
-  if (!email || !password) {
-    alertText.textContent = "Please fill in all email and password fields.";
-    alertBox.classList.add('show');
-    return;
-  }
+        if (!email || !password) {
+          alertText.textContent = "Please fill in all email and password fields.";
+          alertBox.classList.add('show');
+          return;
+        }
 
-  alertBox.classList.remove('show');
-  setLoading(true);
+        alertBox.classList.remove('show');
+        setLoading(true);
 
-  try {
-    // Check lockout state in profiles table
-    const { data: userProfile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('email', email)
-      .maybeSingle();
+        try {
+          // Check lockout state in profiles table
+          const { data: userProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
 
-    if (userProfile && userProfile.lockout_until) {
-      const lockoutTime = new Date(userProfile.lockout_until);
-      if (new Date() < lockoutTime) {
-        const remainingSeconds = Math.ceil((lockoutTime - new Date()) / 1000);
-        setLoading(false);
-        alertText.textContent = `Account locked due to failed attempts. Retry in ${remainingSeconds}s.`;
-        alertBox.classList.add('show');
-        return;
-      } else {
-        await supabase.from('profiles').update({ failed_attempts: 0, lockout_until: null }).eq('id', userProfile.id);
-      }
-    }
+          if (userProfile && userProfile.lockout_until) {
+            const lockoutTime = new Date(userProfile.lockout_until);
+            if (new Date() < lockoutTime) {
+              const remainingSeconds = Math.ceil((lockoutTime - new Date()) / 1000);
+              setLoading(false);
+              alertText.textContent = `Account locked due to failed attempts. Retry in ${remainingSeconds}s.`;
+              alertBox.classList.add('show');
+              return;
+            } else {
+              await supabase.from('profiles').update({ failed_attempts: 0, lockout_until: null }).eq('id', userProfile.id);
+            }
+          }
 
-    // Authenticate user via Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+          // Authenticate user via Supabase Auth
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (authError) {
-      let currentFails = userProfile ? (userProfile.failed_attempts || 0) + 1 : 1;
-      let newLockout = null;
+          if (authError) {
+            let currentFails = userProfile ? (userProfile.failed_attempts || 0) + 1 : 1;
+            let newLockout = null;
 
-      if (currentFails >= 3) {
-        const penaltyMinutes = currentFails === 3 ? 1 : currentFails === 4 ? 3 : 5;
-        newLockout = new Date(Date.now() + penaltyMinutes * 60000).toISOString();
-      }
+            if (currentFails >= 3) {
+              const penaltyMinutes = currentFails === 3 ? 1 : currentFails === 4 ? 3 : 5;
+              newLockout = new Date(Date.now() + penaltyMinutes * 60000).toISOString();
+            }
 
-      if (userProfile) {
-        await supabase.from('profiles').update({
-          failed_attempts: currentFails,
-          lockout_until: newLockout
-        }).eq('id', userProfile.id);
-      }
+            if (userProfile) {
+              await supabase.from('profiles').update({
+                failed_attempts: currentFails,
+                lockout_until: newLockout
+              }).eq('id', userProfile.id);
+            }
 
-      throw new Error(currentFails >= 3 
-        ? `3 Failed attempts reached! Account temporarily locked.` 
-        : `Invalid login credentials. Failed attempts: ${currentFails}/3`);
-    }
+            throw new Error(currentFails >= 3 
+              ? `3 Failed attempts reached! Account temporarily locked.` 
+              : `Invalid login credentials. Failed attempts: ${currentFails}/3`);
+          }
 
-    // Retrieve corresponding user profile details
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', authData.user.id)
-      .single();
+          // Retrieve corresponding user profile details
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
 
-    if (profileError || !profile) throw new Error("Profile record not found.");
+          if (profileError || !profile) throw new Error("Profile record not found.");
 
-    currentProfile = profile;
+          currentProfile = profile;
 
-    await supabase.from('profiles').update({ failed_attempts: 0, lockout_until: null }).eq('id', currentProfile.id);
+          await supabase.from('profiles').update({ failed_attempts: 0, lockout_until: null }).eq('id', currentProfile.id);
 
-    setLoading(false);
+          setLoading(false);
 
-    await logAuditTrail('USER_LOGIN', { email: email });
-    showInAppToast(`Welcome back, ${currentProfile.full_name}!`, 'success');
+          await logAuditTrail('USER_LOGIN', { email: email });
+          showInAppToast(`Welcome back, ${currentProfile.full_name}!`, 'success');
 
-    if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
-      document.getElementById('admin-user-name').textContent = currentProfile.full_name;
-      
-      const roleBadge = document.getElementById('admin-user-role');
-      const logsBtn = document.getElementById('btn-show-logs');
+          if (currentProfile.role === 'admin' || currentProfile.role === 'staff' || currentProfile.role === 'vet') {
+            document.getElementById('admin-user-name').textContent = currentProfile.full_name;
+            
+            const roleBadge = document.getElementById('admin-user-role');
+            const logsBtn = document.getElementById('btn-show-logs');
 
-      if (currentProfile.role === 'admin') {
-        roleBadge.textContent = 'System Administrator';
-        roleBadge.className = 'badge badge-admin';
-        logsBtn.style.display = 'block';
-      } else {
-        roleBadge.textContent = 'Veterinarian / Staff';
-        roleBadge.className = 'badge badge-staff';
-        logsBtn.style.display = 'none';
-      }
+            if (currentProfile.role === 'admin') {
+              roleBadge.textContent = 'System Administrator';
+              roleBadge.className = 'badge badge-admin';
+              logsBtn.style.display = 'block';
+            } else {
+              roleBadge.textContent = 'Veterinarian / Staff';
+              roleBadge.className = 'badge badge-staff';
+              logsBtn.style.display = 'none';
+            }
 
-      switchView('adminDashboard');
-      loadVetRequests();
-    } else {
-      document.getElementById('owner-user-name').textContent = currentProfile.full_name;
-      document.getElementById('owner-user-role').textContent = 'Livestock Owner';
-      document.getElementById('owner-user-role').className = 'badge badge-user';
-      switchView('ownerDashboard');
-      loadOwnerRequests();
-    }
-  } catch (err) {
-    setLoading(false);
-    alertText.textContent = err.message || "Login failed.";
-    alertBox.classList.add('show');
-  }
-});
+            switchView('adminDashboard');
+            loadVetRequests();
+          } else {
+            document.getElementById('owner-user-name').textContent = currentProfile.full_name;
+            document.getElementById('owner-user-role').textContent = 'Livestock Owner';
+            document.getElementById('owner-user-role').className = 'badge badge-user';
+            switchView('ownerDashboard');
+            loadOwnerRequests();
+          }
+        } catch (err) {
+          setLoading(false);
+          alertText.textContent = err.message || "Login failed.";
+          alertBox.classList.add('show');
+        }
+      });
 
       // REGISTER WITH EMAIL, PASSWORD & PROFILES UPSERT
       document.getElementById('register-form').addEventListener('submit', async function(e) {
@@ -1586,20 +1614,20 @@ document.getElementById('login-form').addEventListener('submit', async function(
 
                 <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
                   ${r.status === 'Pending' ? `
-                    <button class="btn btn-success" onclick="openScheduleModal(${r.id})" style="padding: 6px; font-size: 0.75rem;">
+                    <button class="btn btn-success" onclick="openScheduleModal(${r.id})" style="padding: 6px 10px; font-size: 0.75rem; width: auto;">
                       <i class="fa-solid fa-calendar-plus"></i> Approve & Schedule
                     </button>
-                    <button class="btn btn-secondary" onclick="updateStatus(${r.id}, 'Declined')" style="padding: 6px; font-size: 0.75rem;">Decline</button>
+                    <button class="btn btn-secondary" onclick="updateStatus(${r.id}, 'Declined')" style="padding: 6px 10px; font-size: 0.75rem; width: auto;">Decline</button>
                   ` : ''}
 
                   ${r.status === 'Approved' ? `
-                    <button class="btn btn-info" onclick="markAsCompleted(${r.id})" style="padding: 6px; font-size: 0.75rem;">
+                    <button class="btn btn-info" onclick="markAsCompleted(${r.id})" style="padding: 6px 10px; font-size: 0.75rem; width: auto;">
                       <i class="fa-solid fa-square-check"></i> Mark as Done
                     </button>
                   ` : ''}
 
                   ${isAdmin ? `
-                    <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 6px; font-size: 0.75rem;">
+                    <button class="btn btn-danger" onclick="deleteRequest(${r.id})" style="padding: 6px 10px; font-size: 0.75rem; width: auto;">
                       <i class="fa-solid fa-trash"></i> Delete
                     </button>
                   ` : ''}
