@@ -16,6 +16,44 @@
   <!-- Supabase JS Client library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- Mermaid.js for Interactive SIA Architectural Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      securityLevel: 'loose',
+      fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      fontSize: 14,
+      themeVariables: {
+        darkMode: true,
+        background: '#181108',
+        primaryColor: '#2a1a0c',
+        primaryTextColor: '#ffffff',
+        primaryBorderColor: '#d4a359',
+        lineColor: '#e0b56c',
+        secondaryColor: '#38220f',
+        tertiaryColor: '#1a1107',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        fontSize: '14px',
+        clusterBkg: 'rgba(35, 22, 12, 0.92)',
+        clusterBorder: '#d4a359',
+        defaultLinkColor: '#e0b56c',
+        titleColor: '#ffd54f',
+        edgeLabelBackground: '#20150b',
+        nodeTextColor: '#ffffff'
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis',
+        useMaxWidth: false
+      },
+      er: {
+        useMaxWidth: false
+      }
+    });
+  </script>
+
   <style>
     :root {
       --bg-darkest: #120c06;
@@ -29,6 +67,84 @@
       --brand-gold-glow: rgba(212, 163, 89, 0.25);
       
       --text-white: #ffffff;
+
+    /* Interactive SIA Pan & Zoom Styling */
+    .sia-viewport {
+      position: relative;
+      overflow: hidden;
+      background: #150e07;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 163, 89, 0.25);
+      min-height: 480px;
+      height: 60vh;
+      max-height: 640px;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+    .sia-viewport:active {
+      cursor: grabbing;
+    }
+    .sia-panzoom-stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      padding: 24px;
+      display: inline-block;
+      width: max-content;
+      min-width: 100%;
+    }
+    .sia-panzoom-stage svg {
+      max-width: none !important;
+      height: auto !important;
+      display: block;
+      shape-rendering: geometricPrecision;
+      text-rendering: geometricPrecision;
+    }
+    .sia-panzoom-stage .node rect,
+    .sia-panzoom-stage .node circle,
+    .sia-panzoom-stage .node polygon,
+    .sia-panzoom-stage .node path {
+      stroke-width: 2px !important;
+    }
+    .sia-panzoom-stage .node .label {
+      font-weight: 500;
+      color: #ffffff !important;
+    }
+    .sia-panzoom-stage .edgePath path {
+      stroke-width: 2px !important;
+    }
+    .sia-hint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--brand-gold);
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(212, 163, 89, 0.35);
+      border-radius: 20px;
+      padding: 4px 12px;
+      backdrop-filter: blur(4px);
+    }
+    .sia-zoom-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(30, 20, 10, 0.85);
+      border: 1px solid rgba(212, 163, 89, 0.4);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+    .sia-zoom-btn:hover {
+      background: var(--brand-gold);
+      color: #000;
+    }
       --text-muted: #c8bca8;
       --text-dark: #1a1208;
       
@@ -1033,6 +1149,9 @@
           <button class="admin-tab-btn" data-tab="backup" id="admin-tab-backup-btn">
             <i class="fa-solid fa-database"></i> Backup & Recovery (Sec H)
           </button>
+          <button class="admin-tab-btn" data-tab="sia" id="admin-tab-sia-btn" style="border: 1px solid rgba(212, 163, 89, 0.5); background: rgba(212, 163, 89, 0.1);">
+            <i class="fa-solid fa-sitemap" style="color: var(--brand-gold);"></i> SIA Architecture & Diagrams
+          </button>
         </div>
 
         <!-- TAB 1: REQUESTS QUEUE -->
@@ -1239,6 +1358,401 @@
           </div>
         </div>
 
+        <!-- TAB 6: SYSTEM INTEGRATION & ARCHITECTURE (SIA) BLUEPRINTS -->
+        <div class="admin-tab-content" id="tab-content-sia" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h4 style="color: var(--brand-gold); margin: 0; font-size: 1.15rem;">
+                <i class="fa-solid fa-sitemap"></i> System Integration & Architecture (SIA) Blueprints
+              </h4>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 4px 0 0 0;">
+                Official architectural models & diagrams for HerdShield • Evaluator: Mr. Ian Celmar A. Avila & Mr. Roel Daniot
+              </p>
+            </div>
+            <a href="SIA_FINAL_PROJECT_DOCUMENTATION.md" target="_blank" class="btn btn-secondary" style="width: auto; padding: 6px 14px; font-size: 0.75rem;">
+              <i class="fa-solid fa-file-lines"></i> Open Markdown Doc
+            </a>
+          </div>
+
+          <!-- SIA Sub-Diagram Navigator Pills -->
+          <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;" id="sia-diagram-nav">
+            <button type="button" class="btn btn-secondary active sia-pill-btn" onclick="showSiaDiagram('usecase')" style="padding: 6px 12px; font-size: 0.75rem; width: auto;">
+              <i class="fa-solid fa-users-viewfinder"></i> 1. Use Case Diagram
+            </button>
+            <button type="button" class="btn btn-secondary sia-pill-btn" onclick="showSiaDiagram('swimlane')" style="padding: 6px 12px; font-size: 0.75rem; width: auto;">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i> 2. System Flow (Swimlanes)
+            </button>
+            <button type="button" class="btn btn-secondary sia-pill-btn" onclick="showSiaDiagram('erd')" style="padding: 6px 12px; font-size: 0.75rem; width: auto;">
+              <i class="fa-solid fa-database"></i> 3. Database ERD
+            </button>
+            <button type="button" class="btn btn-secondary sia-pill-btn" onclick="showSiaDiagram('flowchart')" style="padding: 6px 12px; font-size: 0.75rem; width: auto;">
+              <i class="fa-solid fa-diagram-project"></i> 4. System Flowchart
+            </button>
+            <button type="button" class="btn btn-secondary sia-pill-btn" onclick="showSiaDiagram('network')" style="padding: 6px 12px; font-size: 0.75rem; width: auto;">
+              <i class="fa-solid fa-network-wired"></i> 5. Network Architecture
+            </button>
+          </div>
+
+          <!-- DIAGRAM 1: USE CASE -->
+          <div class="sia-diagram-panel card" id="sia-panel-usecase" style="margin-bottom: 12px; padding: 16px; background: rgba(18, 12, 6, 0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,163,89,0.25); padding-bottom: 8px; margin-bottom: 12px;">
+              <strong style="color: var(--brand-gold); font-size: 0.92rem;"><i class="fa-solid fa-circle-nodes"></i> Diagram 1: UML Use Case Model</strong>
+              <span class="badge badge-staff">3 Actors • 10 Use Cases</span>
+            </div>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+              Illustrates actor-to-feature boundaries across Registered Farmers, CVO Field Staff, and Administrator Charls Michael Cordero with Supabase cloud services.
+            </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <span class="sia-hint-pill"><i class="fa-solid fa-lightbulb" style="color: #ffd54f;"></i> Click & drag to pan • Mouse wheel or + / - to zoom</span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('usecase', 0.15)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('usecase', -0.15)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="resetSiaDiagram('usecase')" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+              </div>
+            </div>
+            <div class="sia-viewport" id="sia-viewport-usecase">
+              <div class="sia-panzoom-stage" id="sia-stage-usecase">
+                <div class="mermaid" id="mermaid-usecase">
+flowchart LR
+    Farmer["Farmer / Livestock Owner"]
+    Staff["CVO Staff / Veterinarian"]
+    Admin["System Admin (Charls Michael Cordero)"]
+    DBSystem[("Supabase Cloud Backend")]
+
+    subgraph HerdShield_System ["HerdShield: System Boundary"]
+        UC1(["UC-01: Authentication & OTP Recovery"])
+        UC2(["UC-02: Register Head to Ormoc Registry"])
+        UC3(["UC-03: Submit Vaccination Request"])
+        UC4(["UC-04: Schedule in 8-Hr Shift (9AM-5PM)"])
+        UC5(["UC-05: Record Vitals & Mark Done"])
+        UC6(["UC-06: Submit Stock Requisition"])
+        UC7(["UC-07: Approve/Decline Stock Requisition"])
+        UC8(["UC-08: Issue CVO Certificate & QR"])
+        UC9(["UC-09: User Account & Role-Based Control"])
+        UC10(["UC-10: Backup, Restore & Audit Trail"])
+    end
+
+    Farmer --> UC1
+    Farmer --> UC2
+    Farmer --> UC3
+    Farmer --> UC8
+
+    Staff --> UC1
+    Staff --> UC4
+    Staff --> UC5
+    Staff --> UC6
+
+    Admin --> UC1
+    Admin --> UC7
+    Admin --> UC8
+    Admin --> UC9
+    Admin --> UC10
+
+    UC1 -.-> DBSystem
+    UC2 -.-> DBSystem
+    UC3 -.-> DBSystem
+    UC4 -.-> DBSystem
+    UC5 -.-> DBSystem
+    UC6 -.-> DBSystem
+    UC7 -.-> DBSystem
+    UC8 -.-> DBSystem
+    UC9 -.-> DBSystem
+    UC10 -.-> DBSystem
+                </div>
+              </div>
+                        </div>
+          </div>v>
+
+          <!-- DIAGRAM 2: SWIMLANES & POOLS -->
+          <div class="sia-diagram-panel card" id="sia-panel-swimlane" style="display: none; margin-bottom: 12px; padding: 16px; background: rgba(18, 12, 6, 0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,163,89,0.25); padding-bottom: 8px; margin-bottom: 12px;">
+              <strong style="color: var(--brand-gold); font-size: 0.92rem;"><i class="fa-solid fa-arrows-split-up-and-left"></i> Diagram 2: System Flow (Cross-Functional Swimlanes)</strong>
+              <span class="badge badge-approved">3rd & 4th Increment Cycle</span>
+            </div>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+              Demonstrates complete handoffs across 4 pools: Farmer Pool, CVO Field Staff Pool, Admin Pool, and Database Engine Pool.
+            </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <span class="sia-hint-pill"><i class="fa-solid fa-lightbulb" style="color: #ffd54f;"></i> Click & drag to pan • Mouse wheel or + / - to zoom</span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('swimlane', 0.15)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('swimlane', -0.15)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="resetSiaDiagram('swimlane')" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+              </div>
+            </div>
+            <div class="sia-viewport" id="sia-viewport-swimlane">
+              <div class="sia-panzoom-stage" id="sia-stage-swimlane">
+                <div class="mermaid" id="mermaid-swimlane">
+flowchart TD
+    subgraph Farmer_Lane ["Pool: Farmer / Livestock Owner"]
+        F_Start(["Start: Farmer Signs In"]) --> F_Reg["1.1 Register Livestock Head in Registry"]
+        F_Reg --> F_Req["1.2 Submit Vaccination Request & Preferred Date"]
+        F_Track["1.3 Receive In-App Toast & Track Status"]
+        F_Download(["End: Download Verified Clearance Certificate"])
+    end
+
+    subgraph Staff_Lane ["Pool: CVO Staff / Field Veterinarian"]
+        S_Receive["2.1 Receive Live Vaccination Request in Queue"]
+        S_Check{"Within 8-Hour Shift?<br>(09:00 AM - 05:00 PM)"}
+        S_Decline["2.2 Notify Reschedule / Decline"]
+        S_Sched["2.3 Accept & Assign Time Slot"]
+        S_StockCheck{"Sufficient Cold-Chain<br>Vaccine Stock?"}
+        S_ReqStock["2.4 Submit Vaccine Stock Requisition to Admin"]
+        S_Vaccinate["2.5 Visit Site, Check Vitals & Administer Dose"]
+        S_Complete["2.6 Update Status to 'Vaccinated'"]
+    end
+
+    subgraph Admin_Lane ["Pool: Admin (Charls Michael Cordero)"]
+        A_ReviewReq{"3.1 Review Staff Supply Requisition"}
+        A_Approve["3.2 Approve Requisition & Deduct Central Batch Stock"]
+        A_CertReview["3.3 Verify Administered Vaccination Record"]
+        A_IssueCert["3.4 Authorize & Issue CVO Official Certificate with QR"]
+    end
+
+    subgraph DB_Lane ["Pool: Supabase Database & Security Engine"]
+        DB_Herd[("Insert into public.herd")]
+        DB_Req[("Insert into public.vaccination_requests")]
+        DB_UpdateReq[("Update status & scheduled_time")]
+        DB_Requisition[("Insert into public.vaccine_requisitions")]
+        DB_ApproveRequisition[("Update stock in public.vaccines")]
+        DB_Cert[("Insert into public.vaccination_certificates")]
+        DB_Audit[("Write immutable log into public.audit_logs")]
+    end
+
+    F_Reg --> DB_Herd
+    DB_Herd --> DB_Audit
+    F_Req --> DB_Req
+    DB_Req --> F_Track
+    F_Track --> S_Receive
+
+    S_Receive --> S_Check
+    S_Check -- "No" --> S_Decline
+    S_Check -- "Yes" --> S_Sched
+    S_Sched --> DB_UpdateReq
+    DB_UpdateReq --> S_StockCheck
+
+    S_StockCheck -- "Stock Depleted" --> S_ReqStock
+    S_ReqStock --> DB_Requisition
+    DB_Requisition --> A_ReviewReq
+    A_ReviewReq -- "Approve" --> A_Approve
+    A_Approve --> DB_ApproveRequisition
+    DB_ApproveRequisition --> S_Vaccinate
+
+    S_StockCheck -- "In Stock" --> S_Vaccinate
+    S_Vaccinate --> S_Complete
+    S_Complete --> DB_UpdateReq
+    DB_UpdateReq --> A_CertReview
+
+    A_CertReview --> A_IssueCert
+    A_IssueCert --> DB_Cert
+    DB_Cert --> DB_Audit
+    DB_Cert --> F_Download
+                </div>
+              </div>
+                        </div>
+          </div>v>
+
+          <!-- DIAGRAM 3: ERD -->
+          <div class="sia-diagram-panel card" id="sia-panel-erd" style="display: none; margin-bottom: 12px; padding: 16px; background: rgba(18, 12, 6, 0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,163,89,0.25); padding-bottom: 8px; margin-bottom: 12px;">
+              <strong style="color: var(--brand-gold); font-size: 0.92rem;"><i class="fa-solid fa-database"></i> Diagram 3: Database Entity-Relationship Model (ERD)</strong>
+              <span class="badge badge-staff">10 Supabase Tables • PostgreSQL 15</span>
+            </div>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+              Normalized relational schema with primary keys, foreign key constraints, and multi-tenant security policies.
+            </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <span class="sia-hint-pill"><i class="fa-solid fa-lightbulb" style="color: #ffd54f;"></i> Click & drag to pan • Mouse wheel or + / - to zoom</span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('erd', 0.15)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('erd', -0.15)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="resetSiaDiagram('erd')" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+              </div>
+            </div>
+            <div class="sia-viewport" id="sia-viewport-erd">
+              <div class="sia-panzoom-stage" id="sia-stage-erd">
+                <div class="mermaid" id="mermaid-erd">
+erDiagram
+    PROFILES ||--o{ HERD : "owns"
+    PROFILES ||--o{ VACCINATION_REQUESTS : "submits"
+    PROFILES ||--o{ VACCINE_REQUISITIONS : "requests"
+    HERD ||--o{ VACCINATION_REQUESTS : "receives"
+    VACCINES ||--o{ VACCINE_REQUISITIONS : "supplies"
+    VACCINATION_REQUESTS ||--o| VACCINATION_CERTIFICATES : "generates"
+    PROFILES ||--o{ AUDIT_LOGS : "triggers"
+
+    PROFILES {
+        uuid id PK
+        varchar full_name
+        varchar username UK
+        varchar email UK
+        varchar role
+        boolean is_locked
+    }
+    HERD {
+        bigserial id PK
+        varchar animal_tag UK
+        varchar species
+        varchar breed
+        uuid owner_id FK
+        varchar barangay
+    }
+    VACCINES {
+        bigserial id PK
+        varchar vaccine_name
+        varchar batch_number UK
+        int stock_quantity
+    }
+    VACCINE_REQUISITIONS {
+        bigserial id PK
+        varchar requisition_no UK
+        uuid staff_id FK
+        int requested_doses
+        varchar status
+    }
+    VACCINATION_REQUESTS {
+        bigserial id PK
+        varchar request_tracking_no UK
+        uuid user_id FK
+        varchar animal_tag
+        timestamptz scheduled_time
+        varchar status
+    }
+    VACCINATION_CERTIFICATES {
+        bigserial id PK
+        varchar certificate_no UK
+        bigint request_id FK
+        varchar qr_verification_code
+        boolean is_valid
+    }
+    AUDIT_LOGS {
+        bigserial id PK
+        varchar username
+        varchar action
+        varchar result
+        timestamptz created_at
+    }
+                </div>
+              </div>
+                        </div>
+          </div>v>
+
+          <!-- DIAGRAM 4: SYSTEM FLOWCHART -->
+          <div class="sia-diagram-panel card" id="sia-panel-flowchart" style="display: none; margin-bottom: 12px; padding: 16px; background: rgba(18, 12, 6, 0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,163,89,0.25); padding-bottom: 8px; margin-bottom: 12px;">
+              <strong style="color: var(--brand-gold); font-size: 0.92rem;"><i class="fa-solid fa-diagram-project"></i> Diagram 4: System Flowchart & Logic Branches</strong>
+              <span class="badge badge-staff">ANSI Standard Flowchart</span>
+            </div>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+              Complete logic path from input authentication to 8-hour shift constraint checking, supply approval, and certificate generation.
+            </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <span class="sia-hint-pill"><i class="fa-solid fa-lightbulb" style="color: #ffd54f;"></i> Click & drag to pan • Mouse wheel or + / - to zoom</span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('flowchart', 0.15)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('flowchart', -0.15)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="resetSiaDiagram('flowchart')" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+              </div>
+            </div>
+            <div class="sia-viewport" id="sia-viewport-flowchart">
+              <div class="sia-panzoom-stage" id="sia-stage-flowchart">
+                <div class="mermaid" id="mermaid-flowchart">
+flowchart TD
+    Start([User Opens HerdShield]) --> AuthCheck{Existing Active Session?}
+    AuthCheck -- "Yes" --> RoleRoute
+    AuthCheck -- "No" --> LoginForm[/Input Username/Email & Password/]
+    LoginForm --> LockoutCheck{Is Account Under Lockout?}
+    LockoutCheck -- "Yes" --> ShowLockoutTimer[/Display Countdown Banner/] --> Stop1([Halt Login])
+    LockoutCheck -- "No" --> VerifyHash[Hash Password with SHA-256]
+    VerifyHash --> CredsMatch{Credentials Match?}
+    CredsMatch -- "No" --> FailAttempt[Increment Failed Counter & Check Lockout] --> LoginForm
+    CredsMatch -- "Yes" --> ResetCounter[Reset Failed Counter & Start 15-Min Timer]
+    ResetCounter --> RoleRoute{Evaluate User Role}
+
+    RoleRoute -- "Farmer" --> FarmerDash[/Load Farmer Dashboard/]
+    FarmerDash --> SaveHerdDB[(Insert Head into public.herd)]
+    FarmerDash --> SubmitReqDB[(Insert Request into public.vaccination_requests)]
+
+    RoleRoute -- "Staff / Vet" --> StaffDash[/Load CVO Field Queue/]
+    StaffDash --> TimeSlotCheck{Shift Time Slot<br>9:00 AM - 5:00 PM?}
+    TimeSlotCheck -- "No" --> RejectSlot[/Reject Scheduling Slot/] --> StaffDash
+    TimeSlotCheck -- "Yes" --> ApproveReq[(Update Request Status to 'Approved')] --> StaffDash
+    StaffDash --> SaveReqStock[(Submit to public.vaccine_requisitions)] --> StaffDash
+
+    RoleRoute -- "Admin (Charls Cordero)" --> AdminDash[/Load Admin Management Suite/]
+    AdminDash --> RequisitionReview{Approve Requisition?}
+    RequisitionReview -- "Yes" --> ReleaseStock[(Release Vaccine Stock & Update DB)] --> AdminDash
+    AdminDash --> GenCert[(Issue Official Clearance & QR Code)] --> AdminDash
+                </div>
+              </div>
+                        </div>
+          </div>v>
+
+          <!-- DIAGRAM 5: NETWORK ARCHITECTURE -->
+          <div class="sia-diagram-panel card" id="sia-panel-network" style="display: none; margin-bottom: 12px; padding: 16px; background: rgba(18, 12, 6, 0.85);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,163,89,0.25); padding-bottom: 8px; margin-bottom: 12px;">
+              <strong style="color: var(--brand-gold); font-size: 0.92rem;"><i class="fa-solid fa-network-wired"></i> Diagram 5: Distributed Network Architecture & Data Flow</strong>
+              <span class="badge badge-staff">5-Tier Hybrid Cloud</span>
+            </div>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+              Multi-tier distributed cloud topology connecting Ormoc City field devices with edge security and PostgreSQL cloud cluster.
+            </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <span class="sia-hint-pill"><i class="fa-solid fa-lightbulb" style="color: #ffd54f;"></i> Click & drag to pan • Mouse wheel or + / - to zoom</span>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('network', 0.15)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="zoomSiaDiagram('network', -0.15)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" class="sia-zoom-btn" onclick="resetSiaDiagram('network')" title="Reset View"><i class="fa-solid fa-rotate-left"></i></button>
+              </div>
+            </div>
+            <div class="sia-viewport" id="sia-viewport-network">
+              <div class="sia-panzoom-stage" id="sia-stage-network">
+                <div class="mermaid" id="mermaid-network">
+flowchart TB
+    subgraph Ormoc_Client_Tier ["Tier 1: Client Devices (Ormoc City Field & Offices)"]
+        F_Phone["Farmer Mobile Smartphone (PWA)"]
+        S_Tablet["CVO Field Staff Tablet"]
+        A_PC["Admin Workstation (Charls Michael Cordero)"]
+    end
+
+    subgraph Edge_Security_Tier ["Tier 2: Edge Network & Secure Transport"]
+        DNS["Cloudflare DNS & SSL/TLS 1.3"]
+        WAF["Web Application Firewall & Rate Limiting"]
+    end
+
+    subgraph App_Server_Tier ["Tier 3: Web Presentation & Local Node"]
+        Apache["Local Edge Web Server (c:\\xampp\\htdocs\\herdshield)"]
+        HTMLApp["HerdShield SPA Presentation Engine"]
+    end
+
+    subgraph Cloud_Backend_Tier ["Tier 4: Managed Cloud Infrastructure (Supabase)"]
+        KongGateway["Kong API Gateway (kvfnrjuhwbdgqevvuahv.supabase.co)"]
+        PostgREST["PostgREST Engine (RESTful API)"]
+        GoTrue["GoTrue Engine (Session JWT Provider)"]
+    end
+
+    subgraph Data_Storage_Tier ["Tier 5: Database Cluster & Backups"]
+        PostgreSQL[("PostgreSQL 15 Relational DB (RLS Enabled)")]
+        EncryptedStorage["AES-256 Storage (Snapshots & JSON Backups)"]
+    end
+
+    F_Phone -- "HTTPS / TLS 1.3" --> DNS
+    S_Tablet -- "HTTPS / TLS 1.3" --> DNS
+    A_PC -- "Local LAN / Live Server" --> Apache
+    Apache --> HTMLApp
+    DNS --> WAF
+    WAF --> KongGateway
+    HTMLApp -- "RESTful HTTPS" --> KongGateway
+    KongGateway --> PostgREST
+    KongGateway --> GoTrue
+    PostgREST --> PostgreSQL
+    GoTrue --> PostgreSQL
+    PostgreSQL --> EncryptedStorage
+                </div>
+              </div>
+                        </div>
+          </div>
+        </div>
       </div>
 
       <!-- ================================================================= -->
@@ -2504,6 +3018,7 @@
             const adminUsersBtn = document.getElementById('admin-tab-users-btn');
             const adminLogsBtn = document.getElementById('admin-tab-logs-btn');
             const adminBackupBtn = document.getElementById('admin-tab-backup-btn');
+            const adminSiaBtn = document.getElementById('admin-tab-sia-btn');
 
             if (profile.role === 'admin') {
               roleBadge.textContent = 'System Administrator';
@@ -2511,12 +3026,14 @@
               if (adminUsersBtn) adminUsersBtn.style.display = 'flex';
               if (adminLogsBtn) adminLogsBtn.style.display = 'flex';
               if (adminBackupBtn) adminBackupBtn.style.display = 'flex';
+              if (adminSiaBtn) adminSiaBtn.style.display = 'flex';
             } else {
               roleBadge.textContent = 'Veterinarian / Staff';
               roleBadge.className = 'badge badge-staff';
               if (adminUsersBtn) adminUsersBtn.style.display = 'none';
               if (adminLogsBtn) adminLogsBtn.style.display = 'none';
               if (adminBackupBtn) adminBackupBtn.style.display = 'none';
+              if (adminSiaBtn) adminSiaBtn.style.display = 'none';
             }
 
             switchView('adminDashboard');
@@ -3012,7 +3529,158 @@
         heatmap: document.getElementById('tab-content-heatmap'),
         logs: document.getElementById('tab-content-logs'),
         backup: document.getElementById('tab-content-backup'),
-          requisitions: document.getElementById('tab-content-requisitions')
+        requisitions: document.getElementById('tab-content-requisitions'),
+        sia: document.getElementById('tab-content-sia')
+      };
+
+      // =========================================================================
+      // SIA DIAGRAM PAN & ZOOM INTERACTIVE CONTROLS
+      // =========================================================================
+      const siaPanZoomState = {
+        usecase: { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 },
+        swimlane: { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 },
+        erd: { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 },
+        flowchart: { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 },
+        network: { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 }
+      };
+
+      function updateSiaTransform(key) {
+        const stage = document.getElementById('sia-stage-' + key);
+        if (!stage) return;
+        const state = siaPanZoomState[key];
+        stage.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+      }
+
+      window.zoomSiaDiagram = function(key, delta) {
+        if (!siaPanZoomState[key]) return;
+        const state = siaPanZoomState[key];
+        const newScale = Math.min(3.0, Math.max(0.4, +(state.scale + delta).toFixed(2)));
+        state.scale = newScale;
+        updateSiaTransform(key);
+      };
+
+      window.resetSiaDiagram = function(key) {
+        if (!siaPanZoomState[key]) return;
+        siaPanZoomState[key] = { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 };
+        updateSiaTransform(key);
+      };
+
+      function initSiaPanZoomListeners() {
+        ['usecase', 'swimlane', 'erd', 'flowchart', 'network'].forEach(key => {
+          const viewport = document.getElementById('sia-viewport-' + key);
+          if (!viewport || viewport.dataset.panzoomReady) return;
+          viewport.dataset.panzoomReady = 'true';
+
+          viewport.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return; // Primary click only
+            const state = siaPanZoomState[key];
+            state.isDragging = true;
+            state.startX = e.clientX - state.x;
+            state.startY = e.clientY - state.y;
+            viewport.style.cursor = 'grabbing';
+          });
+
+          window.addEventListener('mousemove', (e) => {
+            const state = siaPanZoomState[key];
+            if (!state || !state.isDragging) return;
+            state.x = e.clientX - state.startX;
+            state.y = e.clientY - state.startY;
+            updateSiaTransform(key);
+          });
+
+          window.addEventListener('mouseup', () => {
+            const state = siaPanZoomState[key];
+            if (state && state.isDragging) {
+              state.isDragging = false;
+              if (viewport) viewport.style.cursor = 'grab';
+            }
+          });
+
+          // Wheel zoom
+          viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const state = siaPanZoomState[key];
+            const zoomDelta = e.deltaY < 0 ? 0.12 : -0.12;
+            const newScale = Math.min(3.0, Math.max(0.4, +(state.scale + zoomDelta).toFixed(2)));
+            state.scale = newScale;
+            updateSiaTransform(key);
+          }, { passive: false });
+
+          // Touch gestures for mobile/tablet
+          let initialDist = 0;
+          let initialScale = 1;
+          viewport.addEventListener('touchstart', (e) => {
+            const state = siaPanZoomState[key];
+            if (e.touches.length === 1) {
+              state.isDragging = true;
+              state.startX = e.touches[0].clientX - state.x;
+              state.startY = e.touches[0].clientY - state.y;
+            } else if (e.touches.length === 2) {
+              state.isDragging = false;
+              initialDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+              );
+              initialScale = state.scale;
+            }
+          }, { passive: true });
+
+          viewport.addEventListener('touchmove', (e) => {
+            const state = siaPanZoomState[key];
+            if (e.touches.length === 1 && state.isDragging) {
+              state.x = e.touches[0].clientX - state.startX;
+              state.y = e.touches[0].clientY - state.startY;
+              updateSiaTransform(key);
+            } else if (e.touches.length === 2 && initialDist > 0) {
+              const currentDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+              );
+              const factor = currentDist / initialDist;
+              state.scale = Math.min(3.0, Math.max(0.4, +(initialScale * factor).toFixed(2)));
+              updateSiaTransform(key);
+            }
+          }, { passive: true });
+
+          viewport.addEventListener('touchend', () => {
+            const state = siaPanZoomState[key];
+            if (state) state.isDragging = false;
+            initialDist = 0;
+          });
+        });
+      }
+
+      // Handler to switch between SIA Diagram Panels
+      window.showSiaDiagram = function(diagramKey) {
+        document.querySelectorAll('.sia-pill-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sia-diagram-panel').forEach(p => p.style.display = 'none');
+        
+        const targetPanel = document.getElementById(`sia-panel-${diagramKey}`);
+        if (targetPanel) {
+          targetPanel.style.display = 'block';
+          initSiaPanZoomListeners();
+          if (window.mermaid) {
+            try {
+              const nodes = targetPanel.querySelectorAll('.mermaid');
+              window.mermaid.run({ nodes: nodes }).then(() => {
+                // Ensure rendered SVG fills its native unscaled dimensions with high resolution
+                nodes.forEach(n => {
+                  const svg = n.querySelector('svg');
+                  if (svg) {
+                    svg.style.maxWidth = 'none';
+                    svg.removeAttribute('height');
+                  }
+                });
+              }).catch(err => console.warn('Mermaid run error:', err));
+            } catch(e) {
+              console.warn('Mermaid rendering notice:', e);
+            }
+          }
+        }
+
+        // Highlight matching pill button
+        const activeBtn = Array.from(document.querySelectorAll('.sia-pill-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(diagramKey));
+        if (activeBtn) activeBtn.classList.add('active');
       };
 
       adminTabs.forEach(tab => {
@@ -3032,7 +3700,15 @@
           else if (target === 'heatmap') loadOrmocHeatmap();
           else if (target === 'backup') loadBackupHistory();
           else if (target === 'requests') loadAdminRequests();
+          else if (target === 'sia') {
+            const activePanel = Array.from(document.querySelectorAll('.sia-diagram-panel')).find(p => p.style.display !== 'none');
+            const key = activePanel ? activePanel.id.replace('sia-panel-', '') : 'usecase';
+            window.showSiaDiagram(key);
+          }
           else if (target === 'requisitions') loadAdminRequisitions();
+          else if (target === 'sia') {
+            showSiaDiagram('usecase');
+          }
         });
       });
 
